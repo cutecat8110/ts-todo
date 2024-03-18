@@ -1,58 +1,110 @@
 <template>
-  <div class="min-h-screen container py-12 flex items-center justify-center">
-    <VForm @submit="submit" class="max-w-96 flex flex-col flex-1 gap-16 pb-16" v-slot="{ errors }">
-      <div>
-        <h1 class="text-4xl font-bold text-center">TS Todo</h1>
-        <h2 class="text-sm mt-4 text-center text-gray-400">Sign in to System</h2>
+  <div class="container flex min-h-screen items-center justify-center py-12">
+    <VForm
+      ref="formRefs"
+      v-slot="{ errors }"
+      class="flex max-w-80 flex-1 flex-col gap-16 pb-16"
+      @submit="loginExecute()"
+    >
+      <div class="tracking-widest">
+        <h1 class="text-center text-4xl font-bold">TS Todo</h1>
+        <h2 class="mt-2 text-center text-sm text-gray-400">Sign in to System</h2>
       </div>
-      <div>
-        <label for="email" class="block">
-          <div class="font-bold">Email</div>
+      <div class="space-y-4">
+        <label class="block" for="email">
+          <div class="font-bold">電子信箱</div>
           <VField
-            label="Email"
-            type="text"
-            name="email"
             id="email"
+            v-model="fromData.email"
             :class="[
               errors.email ? 'ring-red-600' : 'ring-gray-300 focus:ring-blue-600',
-              'mt-2 w-full outline-none rounded-md px-4 py-2 ring-1 ring-inset'
+              'mt-2 w-full rounded-md px-4 py-2 outline-none ring-1 ring-inset'
             ]"
-            rules="required"
+            name="email"
+            label="電子信箱"
+            type="text"
+            rules="required|email"
+            :disabled="apiFetching"
           />
-          <ErrorMessage name="email" class="block mt-2 text-red-600" />
+          <ErrorMessage class="mt-2 block text-red-600" name="email" />
         </label>
-        <label for="password" class="block mt-4">
-          <div class="font-bold">Password</div>
+        <label class="block" for="password">
+          <div class="font-bold">密碼</div>
           <VField
-            label="Password"
-            type="password"
-            name="password"
             id="password"
+            v-model="fromData.password"
             :class="[
-              errors.password ? 'ring-red-600' : 'ring-gray-300 focus:ring-blue-600',
-              'mt-2 w-full outline-none rounded px-4 py-2 ring-1 ring-inset'
+              errors.password ? 'ring-red-600' : 'ring-gray-300 focus:ring-blue-600 ',
+              'mt-2 w-full rounded  px-4 py-2 outline-none ring-1 ring-inset'
             ]"
+            name="password"
+            label="密碼"
+            type="password"
             rules="required"
+            :disabled="apiFetching"
           />
-          <ErrorMessage name="password" class="block mt-2 text-red-600" />
+          <ErrorMessage class="mt-2 block text-red-600" name="password" />
         </label>
       </div>
-      <div class="flex flex-col gap-4 items-center font-bold">
-        <button
-          type="submit"
-          class="rounded w-full bg-blue-600 text-white py-2 transition-colors hover:bg-blue-700"
-        >
-          登入
-        </button>
-        <RouterLink class="text-blue-600 hover:underline" :to="{ name: 'signup' }">
-          註冊
+
+      <div class="space-y-4">
+        <UIButton label="登入" type="submit" block size="lg" :disabled="apiFetching" />
+        <RouterLink v-slot="{ navigate }" :to="{ name: 'signup' }" custom>
+          <UIButton
+            class="mx-auto"
+            label="註冊"
+            role="link"
+            size="lg"
+            variant="link"
+            :disabled="apiFetching"
+            @click="navigate"
+          />
         </RouterLink>
       </div>
-      <div class="text-sm text-center text-gray-600">Copyright © 2024 by Hao</div>
+      <div class="text-center text-xs text-gray-600">Copyright © 2024 by Hao</div>
     </VForm>
   </div>
 </template>
 
-<script setup lang="ts">
-const submit = () => {}
+<script lang="ts" setup>
+import { login } from '@/api/index'
+import { useCommonStore } from '@/stores'
+import type { LoginForm } from '@/types/index'
+
+/* 全局屬性 */
+const commonStore = useCommonStore()
+const router = useRouter()
+const Swal = getCurrentInstance()?.proxy?.$Swal
+
+/* 表單 */
+const formRefs = ref()
+const fromData = ref<LoginForm>({
+  email: 'test@example.com',
+  password: 'test123456'
+})
+
+/* 登入 API */
+const { isFetching: apiFetching, execute: loginExecute } = login({
+  afterFetch({ data }) {
+    const { token, nickname } = data
+    commonStore.auth = {
+      token,
+      nickname
+    }
+    router.push({ name: 'todo' })
+    return { data }
+  },
+  onFetchError({ data }) {
+    Swal?.fire({
+      title: data.message,
+      icon: 'error',
+      showConfirmButton: false,
+      timer: 2000,
+      willClose: () => {
+        document.getElementById('email')?.focus()
+      }
+    })
+    return data
+  }
+}).post(fromData.value)
 </script>
