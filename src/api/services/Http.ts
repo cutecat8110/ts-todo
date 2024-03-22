@@ -1,9 +1,6 @@
 import { useCommonStore } from '@/stores/common'
 import type { UseFetchOptions } from '@vueuse/core'
 import { createFetch } from '@vueuse/core'
-interface MyFetchOptions extends UseFetchOptions {
-  params?: {}
-}
 
 const fetch = createFetch({
   baseUrl: import.meta.env.VITE_BASE_API,
@@ -31,34 +28,24 @@ const fetch = createFetch({
   }
 })
 
-const MyFetch = (url: string, method: string, options: MyFetchOptions) => {
-  const { params = {}, ...otherOptions } = options
-
-  const replacedUrl = Object.entries(params).reduce((accUrl, [key, value]) => {
-    return (accUrl as string).replace(`{${key}}`, value as string)
-  }, url)
-
-  return fetch(replacedUrl, { method: method }, otherOptions).json()
-}
-
 export default class Http {
-  static get(url: string, options: MyFetchOptions) {
-    return MyFetch(url, 'GET', options)
+  static get(url: string, options: UseFetchOptions) {
+    return fetch(url, { method: 'GET' }, options).json()
   }
 
-  static post(url: string, options: MyFetchOptions) {
-    return MyFetch(url, 'POST', options)
+  static post(url: string, options: UseFetchOptions) {
+    return fetch(url, { method: 'POST' }, options).json()
   }
 
-  static put(url: string, options: MyFetchOptions) {
-    return MyFetch(url, 'PUT', options)
+  static put(url: string, options: UseFetchOptions) {
+    return fetch(url, { method: 'PUT' }, options).json()
   }
 
-  static delete(url: string, options: MyFetchOptions) {
-    return MyFetch(url, 'DELETE', options)
+  static delete(url: string, options: UseFetchOptions) {
+    return fetch(url, { method: 'DELETE' }, options).json()
   }
 
-  static patch(url: string, options: MyFetchOptions) {
-    return MyFetch(url, 'PATCH', options)
+  static patch(url: string, options: UseFetchOptions) {
+    return fetch(url, { method: 'PATCH' }, options).json()
   }
 }

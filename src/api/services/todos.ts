@@ -1,22 +1,23 @@
-import Http from './Http'
 import type { UseFetchOptions } from '@vueuse/core'
 
-export function getTodo(options: UseFetchOptions) {
+import Http from './Http'
+
+export function getTodoAPI(options: UseFetchOptions) {
   return Http.get('/todos', options)
 }
 
-export function addTodo(options: UseFetchOptions) {
+export function addTodoAPI(options: UseFetchOptions) {
   return Http.post('/todos', options)
 }
 
-export function updateTodo(options: UseFetchOptions) {
-  return Http.put('/todos', options)
+export function updateTodoAPI(options: UseFetchOptions) {
+  return Http.put('/todos/{id}', options)
 }
 
-export function deleteTodo(options: UseFetchOptions) {
-  return Http.delete('/todos', options)
+export function deleteTodoAPI(options: UseFetchOptions) {
+  return Http.delete('/todos/{id}', options)
 }
 
-export function toggleTodo(options: UseFetchOptions) {
+export function toggleTodoAPI(options: UseFetchOptions) {
   return Http.patch('/todos/{id}/toggle', options)
 }

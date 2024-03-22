@@ -1,4 +1,4 @@
-import { auth } from '@/api/index'
+import { authAPI } from '@/api'
 import { useCommonStore, useStyleStore } from '@/stores'
 import Swal from 'sweetalert2'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -30,7 +30,7 @@ router.beforeEach(async (to) => {
     if (commonStore.auth.token == '') {
       return { name: 'login' }
     }
-    const { error } = await auth({ immediate: true })
+    const { error } = await authAPI({ immediate: true })
     if (error.value) {
       const useStyle = useStyleStore()
       const result = await Swal.fire({

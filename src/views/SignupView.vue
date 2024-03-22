@@ -91,9 +91,9 @@
 </template>
 
 <script lang="ts" setup>
-import { signup } from '@/api/index'
+import { signupAPI } from '@/api'
 import { useStyleStore } from '@/stores'
-import type { SignupForm } from '@/types/index'
+import type { SignupForm } from '@/types'
 
 /* 全局屬性 */
 const useStyle = useStyleStore()
@@ -109,7 +109,7 @@ const fromData = ref<SignupForm>({
 })
 
 /* 註冊 API */
-const { isFetching: apiFetching, execute: signupExecute } = signup({
+const { isFetching: apiFetching, execute: signupExecute } = signupAPI({
   afterFetch({ data }) {
     Swal?.fire({
       title: '註冊成功!',

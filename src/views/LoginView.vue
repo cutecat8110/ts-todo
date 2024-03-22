@@ -48,11 +48,12 @@
       </div>
 
       <div class="space-y-4">
-        <UIButton label="登入" type="submit" block size="lg" :disabled="apiFetching" />
+        <UIButton label="登入" type="submit" block color="blue" size="lg" :disabled="apiFetching" />
         <RouterLink v-slot="{ navigate }" :to="{ name: 'signup' }" custom>
           <UIButton
             class="mx-auto"
             label="註冊"
+            color="blue"
             role="link"
             size="lg"
             variant="link"
@@ -67,9 +68,9 @@
 </template>
 
 <script lang="ts" setup>
-import { login } from '@/api/index'
+import { loginAPI } from '@/api'
 import { useCommonStore } from '@/stores'
-import type { LoginForm } from '@/types/index'
+import type { LoginForm } from '@/types'
 
 /* 全局屬性 */
 const commonStore = useCommonStore()
@@ -84,7 +85,7 @@ const fromData = ref<LoginForm>({
 })
 
 /* 登入 API */
-const { isFetching: apiFetching, execute: loginExecute } = login({
+const { isFetching: apiFetching, execute: loginExecute } = loginAPI({
   afterFetch({ data }) {
     const { token, nickname } = data
     commonStore.auth = {
