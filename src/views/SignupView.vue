@@ -101,7 +101,7 @@ const router = useRouter()
 const Swal = getCurrentInstance()?.proxy?.$Swal
 
 /* 表單 */
-const formRefs = ref()
+const formRefs = ref<HTMLFormElement | null>(null)
 const fromData = ref<SignupForm>({
   email: 'test@example.com',
   password: 'test123456',

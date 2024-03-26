@@ -1,7 +1,7 @@
 <template>
   <div class="my-bg flex min-h-screen flex-col">
     <!-- Header -->
-    <header class="sticky top-0 border-b bg-white/90 backdrop-blur-sm z-10">
+    <header class="sticky top-0 z-10 border-b bg-white/90 backdrop-blur-sm">
       <div
         class="container flex h-16 items-center justify-between gap-6 overflow-hidden text-nowrap text-4xl"
       >

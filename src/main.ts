@@ -22,7 +22,6 @@ configure({
 setLocale('zh_TW') // 設定預設語系
 
 import dayjs from '@/plugins/dayjs'
-import gsap from '@/plugins/gsap'
 import Swal from '@/plugins/sweetalert2'
 import { Icon } from '@iconify/vue'
 
@@ -40,6 +39,5 @@ app.component('Icon', Icon)
 
 app.use(dayjs)
 app.use(Swal)
-app.use(gsap)
 
 app.mount('#app')

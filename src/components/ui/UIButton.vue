@@ -47,7 +47,7 @@ const currentIcon = computed(() => {
   return props.loading ? 'line-md:loading-twotone-loop' : props.icon
 })
 
-const cssColor = computed(() => {
+const cssColor = computed<string>(() => {
   return {
     solid: {
       default:

@@ -1,46 +1,81 @@
-# ts-todo
+# TS Todo
 
-This template should help get you started developing with Vue 3 in Vite.
+> 這是一個 Vue3 + TypeScript 的練習專案，提供註冊功能的待辦事項應用程式。
 
-## Recommended IDE Setup
+<br />
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## 🌸 安裝與使用
 
-## Type Support for `.vue` Imports in TS
+### 系統需求
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+建議 Node.js 20.11.1 或更高版本。
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+### 取得專案
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+```sh
+git clone https://github.com/cutecat8110/ts-todo.git
+```
 
-## Customize configuration
+### 設定環境
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+複製 .env.example 改為 .env
 
-## Project Setup
+```sh
+cp .env.example .env
+```
+
+### 安裝依賴
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### 啟動開發環境
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+<br />
 
-```sh
-npm run build
-```
+## 🔨 核心技術
 
-### Lint with [ESLint](https://eslint.org/)
+- [Vue.js 3](https://vuejs.org/)
 
-```sh
-npm run lint
-```
+  > JavaScript 框架
+
+- [TypeScript](https://www.typescriptlang.org/)
+
+  > JavaScript 的超集
+
+- [Pinia](https://pinia.vuejs.org/)
+
+  > Vue.js 的狀態管理庫
+
+- [Tailwind CSS](https://tailwindcss.com/)
+
+  > CSS 框架
+
+<br />
+
+## 🛠️ 擴展套件
+
+- [SweetAlert2](https://sweetalert2.github.io/)
+
+  > 美觀且可定製的訊息彈框
+
+- [VeeValidate](https://vee-validate.logaretm.com/v4/)
+
+  > 表單驗證庫
+
+- [Day.js](https://day.js.org/)
+
+  > 輕量級日期和時間處理庫
+
+- [VueUse](https://vueuse.org/)
+
+  > 針對 Vue 3 Composition API 的實用函數庫
+
+- [Iconify](https://iconify.design/)
+
+  > 開源的圖標集合

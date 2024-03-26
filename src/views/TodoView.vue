@@ -2,11 +2,15 @@
   <LayoutDefault>
     <main class="flex-1 py-10">
       <div class="container space-y-4 lg:max-w-[50rem]">
+        <!-- 歡迎訊息 -->
         <div class="text-2xl font-black">
           {{ amPm }}，{{ commonStore.auth.nickname }}，歡迎回來👋
         </div>
+
+        <!-- 新增代辦輸入框 -->
         <div class="space-y-6 rounded-xl bg-gray-100 p-6">
           <div class="flex items-center justify-between font-black text-gray-600">
+            <!-- 當前日期 -->
             <div class="flex gap-2 text-[2.5rem] leading-none">
               {{ $dayjs(now).format('DD') }}
               <div class="text-sm">
@@ -18,12 +22,13 @@
                 </div>
               </div>
             </div>
+            <!-- 當前星期幾 -->
             <div class="text-2xl text-gray-600">
               {{ $dayjs(now).format('dddd') }}
             </div>
           </div>
 
-          <!-- Todo Input -->
+          <!-- Todo 輸入框 -->
           <div class="flex space-x-4">
             <textarea
               ref="addTodoRefs"
@@ -31,28 +36,20 @@
               class="flex-1 resize-none rounded-md px-4 py-2 outline-none ring-1 ring-inset ring-gray-300 focus:ring-blue-600"
               placeholder="Todo"
               :disabled="apiFetching"
-              @keydown="handleKeyDown"
+              @keydown="onKeyboardSubmit"
             />
             <UIButton
               label="新增"
               color="blue"
               size="lg"
               :disabled="apiFetching"
-              @click="addTodoExecute()"
+              @click="onTodoSubmit()"
             />
           </div>
         </div>
 
-        <!-- Todo List -->
-        <TransitionGroup
-          class="relative flex flex-col gap-4"
-          name="todo-list"
-          tag="ul"
-          @before-enter="beforeEnter"
-          @before-leave="beforeLeave"
-          @enter="enter"
-          @leave="leave"
-        >
+        <!-- 代辦清單 -->
+        <TransitionGroup class="relative space-y-4" name="todo-list" tag="ul">
           <li
             v-for="(todo, index) in TodoList"
             :key="todo.id"
@@ -63,6 +60,7 @@
             ]"
             @click="!todo.edit && toggleTodo(todo, index)"
           >
+            <!-- 代辦完成狀態 -->
             <UIButton
               class="pointer-events-none shrink-0"
               :color="todo.status ? 'blue' : undefined"
@@ -71,9 +69,13 @@
               square
               variant="text"
             />
+
+            <!-- 代辦內容 -->
             <div v-if="!todo.edit" class="overflow-hidden text-ellipsis">
               {{ todo.content }}
             </div>
+
+            <!-- 編輯代辦輸入框 -->
             <textarea
               v-else
               :ref="(el) => (todo.editTodoRefs = el as HTMLTextAreaElement)"
@@ -84,6 +86,7 @@
               @click.stop
             />
             <div class="ml-auto flex shrink-0 gap-2 pl-2">
+              <!--  編輯&刪除 -->
               <template v-if="!todo.edit">
                 <UIButton
                   icon="ic:round-mode-edit-outline"
@@ -100,6 +103,8 @@
                   @click.stop="deleteTodo(todo, index)"
                 />
               </template>
+
+              <!--  取消/完成編輯 -->
               <template v-else>
                 <UIButton
                   color="lightGray"
@@ -136,13 +141,12 @@ import { useNow, useTextareaAutosize } from '@vueuse/core'
 /* 全局屬性 */
 const commonStore = useCommonStore()
 const dayjs = getCurrentInstance()?.proxy?.$dayjs
-const gsap = getCurrentInstance()?.proxy?.$gsap
 
 /* 當前時間 */
 const now = useNow()
 
 /* 問候語 */
-const amPm = computed(() => {
+const amPm = computed<string>(() => {
   const currentHour = dayjs?.(now.value).hour()
 
   if (currentHour === undefined) return ''
@@ -154,7 +158,7 @@ const amPm = computed(() => {
 })
 
 /* API 狀態 */
-const apiFetching = computed(
+const apiFetching = computed<boolean>(
   () =>
     addTodoFetching.value ||
     getTodoFetching.value ||
@@ -163,43 +167,12 @@ const apiFetching = computed(
     updateTodoFetching.value
 )
 
-/* Todo */
-const TodoList: Ref<Todo[]> = ref([])
-const currentTodo: Ref<Todo> = ref({} as Todo)
-const currentIndex: Ref<number> = ref(-1)
+/* 待辦事項 */
+const TodoList = ref<Todo[]>([])
+const currentTodo = ref<Todo>({} as Todo)
+const currentIndex = ref<number>(-1)
 
-// Todo: 動效
-const beforeEnter = (el: any) => {
-  gsap?.set(el, {
-    x: -80,
-    opacity: 0
-  })
-}
-const enter = (el: any, done: any) => {
-  gsap?.to(el, {
-    duration: 0.3,
-    x: 0,
-    opacity: 1,
-    ease: 'power1.in',
-    onComplete: done
-  })
-}
-const beforeLeave = (el: any) => {
-  gsap?.set(el, {
-    top: `${el.offsetTop}px`
-  })
-}
-const leave = (el: any, done: any) => {
-  gsap?.to(el, {
-    duration: 0.3,
-    x: 80,
-    opacity: 0,
-    ease: 'power1.out',
-    onComplete: done
-  })
-}
-
-// Todo: 取得全部代辦 API
+// 取得全部代辦 API
 const { isFetching: getTodoFetching, execute: getTodoExecute } = getTodoAPI({
   immediate: true,
   afterFetch({ data }) {
@@ -217,9 +190,19 @@ const { isFetching: getTodoFetching, execute: getTodoExecute } = getTodoAPI({
   }
 })
 
-// Todo: 新增代辦 - 輸入框自動大小
-const { textarea: addTodoRefs, input: addTodoData } = useTextareaAutosize({ input: ref('') })
-// Todo: 新增代辦 API
+// 新增代辦 - 輸入框自動大小
+const { textarea: addTodoRefs, input: addTodoData } = useTextareaAutosize({
+  input: ref<string>('')
+})
+// Todo: 新增代辦
+const onTodoSubmit = () => {
+  if (addTodoData.value !== '') return addTodoExecute()
+}
+// Todo: 新增代辦 - Enter送出/換行
+const onKeyboardSubmit = (event: KeyboardEvent) => {
+  if (event.ctrlKey && event.key === 'Enter') return addTodoExecute()
+}
+// 新增代辦 API
 const { isFetching: addTodoFetching, execute: addTodoExecute } = addTodoAPI({
   afterFetch({ data }) {
     addTodoData.value = ''
@@ -227,18 +210,14 @@ const { isFetching: addTodoFetching, execute: addTodoExecute } = addTodoAPI({
     return { data }
   }
 }).post(computed(() => ({ content: addTodoData.value })))
-// Todo: 新增代辦 - Enter送出/換行
-const handleKeyDown = (event: any) => {
-  if (event.ctrlKey && event.key === 'Enter') return addTodoExecute()
-}
 
-// Todo: 刪除代辦
+// 刪除代辦
 const deleteTodo = async (todo: Todo, index: number) => {
   currentTodo.value = todo
   currentIndex.value = index
   deleteTodoExecute()
 }
-// Todo: 刪除代辦 API
+// 刪除代辦 API
 const { isFetching: deleteTodoFetching, execute: deleteTodoExecute } = deleteTodoAPI({
   beforeFetch({ url }) {
     return { url: replaceParams(url, { id: currentTodo.value.id }) }
@@ -249,13 +228,13 @@ const { isFetching: deleteTodoFetching, execute: deleteTodoExecute } = deleteTod
   }
 })
 
-// Todo: 切換代辦完成狀態
+// 切換代辦完成狀態
 const toggleTodo = (todo: Todo, index: number) => {
   currentTodo.value = todo
   currentIndex.value = index
   toggleTodoExecute()
 }
-// Todo: 切換代辦完成狀態 API
+// 切換代辦完成狀態 API
 const { isFetching: toggleTodoFetching, execute: toggleTodoExecute } = toggleTodoAPI({
   beforeFetch({ url }) {
     return { url: replaceParams(url, { id: currentTodo.value.id }) }
@@ -266,7 +245,7 @@ const { isFetching: toggleTodoFetching, execute: toggleTodoExecute } = toggleTod
   }
 })
 
-// Todo: 切換編輯代辦內容
+// 切換編輯代辦內容
 const editTodoToggle = (index: number) => {
   TodoList.value[index].tempContent = TodoList.value[index].content
   TodoList.value[index].edit = !TodoList.value[index].edit
@@ -276,7 +255,7 @@ const editTodoToggle = (index: number) => {
     })
   }
 }
-// Todo: 編輯代辦內容 - 輸入框自動大小
+// 編輯代辦內容 - 輸入框自動大小
 watch(
   () => TodoList.value.map((todo) => todo.editTodoRefs),
   (newRefsArray, oldRefsArray) => {
@@ -296,13 +275,13 @@ watch(
   { deep: true }
 )
 
-// Todo: 更新代辦內容
+// 更新代辦內容
 const updateTodo = (todo: Todo, index: number) => {
   currentTodo.value = todo
   currentIndex.value = index
   updateTodoExecute()
 }
-// Todo: 更新代辦內容 API
+// 更新代辦內容 API
 const { isFetching: updateTodoFetching, execute: updateTodoExecute } = updateTodoAPI({
   beforeFetch({ url }) {
     return { url: replaceParams(url, { id: currentTodo.value.id }) }
@@ -316,11 +295,23 @@ const { isFetching: updateTodoFetching, execute: updateTodoExecute } = updateTod
 </script>
 
 <style lang="scss" scoped>
+.todo-list-move,
+.todo-list-enter-active,
 .todo-list-leave-active {
-  position: absolute;
+  transition: all 0.3s ease-in-out;
 }
 
-.todo-list-move {
-  transition: all 0.3s ease-in-out;
+.todo-list-enter-from {
+  opacity: 0;
+  transform: translateX(-80px);
+}
+
+.todo-list-leave-to {
+  opacity: 0;
+  transform: translateX(80px);
+}
+
+.todo-list-leave-active {
+  position: absolute;
 }
 </style>
