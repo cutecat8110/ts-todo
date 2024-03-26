@@ -15,7 +15,7 @@
           <div class="font-bold">電子信箱</div>
           <VField
             id="email"
-            v-model="fromData.email"
+            v-model.trim="fromData.email"
             :class="[
               errors.email ? 'ring-red-600' : 'ring-gray-300 focus:ring-blue-600',
               'mt-2 w-full rounded-md px-4 py-2 outline-none ring-1 ring-inset'
@@ -32,7 +32,7 @@
           <div class="font-bold">密碼</div>
           <VField
             id="password"
-            v-model="fromData.password"
+            v-model.trim="fromData.password"
             :class="[
               errors.password ? 'ring-red-600' : 'ring-gray-300 focus:ring-blue-600 ',
               'mt-2 w-full rounded  px-4 py-2 outline-none ring-1 ring-inset'

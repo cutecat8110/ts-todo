@@ -1,26 +1,6 @@
 <template>
-  <div class="flex min-h-screen flex-col">
-    <!-- Header -->
-    <header class="sticky top-0 border-b bg-white/90 backdrop-blur-sm">
-      <div
-        class="container flex h-16 items-center justify-between gap-6 overflow-hidden text-nowrap text-4xl"
-      >
-        <h1 class="font-bold tracking-widest text-blue-600">TS Todo</h1>
-        <UIButton
-          label="登出"
-          color="blue"
-          icon="ic:baseline-logout"
-          size="lg"
-          trailing
-          variant="link"
-          :disabled="apiFetching"
-          @click="logoutExecute"
-        />
-      </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="my-bg flex-1 py-10">
+  <LayoutDefault>
+    <main class="flex-1 py-10">
       <div class="container space-y-4 lg:max-w-[50rem]">
         <div class="text-2xl font-black">
           {{ amPm }}，{{ commonStore.auth.nickname }}，歡迎回來👋
@@ -47,10 +27,11 @@
           <div class="flex space-x-4">
             <textarea
               ref="addTodoRefs"
-              v-model="addTodoData"
+              v-model.trim="addTodoData"
               class="flex-1 resize-none rounded-md px-4 py-2 outline-none ring-1 ring-inset ring-gray-300 focus:ring-blue-600"
               placeholder="Todo"
               :disabled="apiFetching"
+              @keydown="handleKeyDown"
             />
             <UIButton
               label="新增"
@@ -63,116 +44,99 @@
         </div>
 
         <!-- Todo List -->
-        <div
-          v-for="(todo, index) in TodoList"
-          :key="todo.id"
-          :class="[
-            todo.status && !todo.edit && 'line-through',
-            todo.status ? 'border-transparent bg-gray-100 text-gray-500 ' : 'bg-white',
-            'flex items-center rounded-xl border-2  p-[0.625rem] px-4 font-black transition-all hover:border-gray-300 hover:shadow '
-          ]"
-          @click="!todo.edit && toggleTodo(todo, index)"
+        <TransitionGroup
+          class="relative flex flex-col gap-4"
+          name="todo-list"
+          tag="ul"
+          @before-enter="beforeEnter"
+          @before-leave="beforeLeave"
+          @enter="enter"
+          @leave="leave"
         >
-          <UIButton
-            class="pointer-events-none shrink-0"
-            :color="todo.status ? 'blue' : undefined"
-            :icon="todo.status ? 'ic:round-radio-button-checked' : 'ic:outline-circle'"
-            size="lg"
-            square
-            variant="text"
-          />
-          <div v-if="!todo.edit" class="overflow-hidden text-ellipsis">
-            {{ todo.content }}
-          </div>
-          <textarea
-            v-else
-            :ref="(el) => (todo.editTodoRefs = el as HTMLTextAreaElement)"
-            v-model="todo.tempContent"
-            class="flex-1 resize-none rounded-md px-4 py-2 outline-none ring-1 ring-inset ring-gray-300 focus:ring-blue-600"
-            placeholder="Todo"
-            :disabled="apiFetching"
-            @click.stop
-          />
-          <div class="ml-auto flex shrink-0 gap-2 pl-2">
-            <template v-if="!todo.edit">
-              <UIButton
-                icon="ic:round-mode-edit-outline"
-                square
-                variant="text"
-                :disabled="apiFetching"
-                @click.stop="editTodoToggle(index)"
-              />
-              <UIButton
-                icon="ic:baseline-delete"
-                square
-                variant="text"
-                :disabled="apiFetching"
-                @click.stop="deleteTodo(todo, index)"
-              />
-            </template>
-            <template v-else>
-              <UIButton
-                color="lightGray"
-                icon="ic:round-close"
-                square
-                variant="text"
-                :disabled="apiFetching"
-                @click.stop="editTodoToggle(index)"
-              />
-              <UIButton
-                color="green"
-                icon="ic:round-done"
-                square
-                variant="text"
-                :disabled="apiFetching"
-                @click.stop="updateTodo(todo, index)"
-              />
-            </template>
-          </div>
-        </div>
+          <li
+            v-for="(todo, index) in TodoList"
+            :key="todo.id"
+            :class="[
+              todo.status && !todo.edit && 'line-through',
+              todo.status ? 'border-transparent bg-gray-100 text-gray-500 ' : 'bg-white',
+              'flex w-full items-center rounded-xl border-2  p-[0.625rem] px-4 font-black transition-all hover:border-gray-300 hover:shadow '
+            ]"
+            @click="!todo.edit && toggleTodo(todo, index)"
+          >
+            <UIButton
+              class="pointer-events-none shrink-0"
+              :color="todo.status ? 'blue' : undefined"
+              :icon="todo.status ? 'ic:round-radio-button-checked' : 'ic:outline-circle'"
+              size="lg"
+              square
+              variant="text"
+            />
+            <div v-if="!todo.edit" class="overflow-hidden text-ellipsis">
+              {{ todo.content }}
+            </div>
+            <textarea
+              v-else
+              :ref="(el) => (todo.editTodoRefs = el as HTMLTextAreaElement)"
+              v-model.trim="todo.tempContent"
+              class="flex-1 resize-none rounded-md px-4 py-2 outline-none ring-1 ring-inset ring-gray-300 focus:ring-blue-600"
+              placeholder="Todo"
+              :disabled="apiFetching"
+              @click.stop
+            />
+            <div class="ml-auto flex shrink-0 gap-2 pl-2">
+              <template v-if="!todo.edit">
+                <UIButton
+                  icon="ic:round-mode-edit-outline"
+                  square
+                  variant="text"
+                  :disabled="apiFetching"
+                  @click.stop="editTodoToggle(index)"
+                />
+                <UIButton
+                  icon="ic:baseline-delete"
+                  square
+                  variant="text"
+                  :disabled="apiFetching"
+                  @click.stop="deleteTodo(todo, index)"
+                />
+              </template>
+              <template v-else>
+                <UIButton
+                  color="lightGray"
+                  icon="ic:round-close"
+                  square
+                  variant="text"
+                  :disabled="apiFetching"
+                  @click.stop="editTodoToggle(index)"
+                />
+                <UIButton
+                  color="green"
+                  icon="ic:round-done"
+                  square
+                  variant="text"
+                  :disabled="apiFetching"
+                  @click.stop="updateTodo(todo, index)"
+                />
+              </template>
+            </div>
+          </li>
+        </TransitionGroup>
       </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="border-t bg-white">
-      <div class="container flex h-14 items-center justify-center">
-        <h6 class="text-sm font-bold text-gray-600">Copyright © 2024 by Hao</h6>
-      </div>
-    </footer>
-
-    <!-- Scroll Top -->
-    <Transition>
-      <div
-        v-if="scrollTopIsShow"
-        class="fixed bottom-10 right-10 z-10 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-black/20 text-[2.163rem] text-white transition-all hover:bg-black/40 hover:shadow"
-        @click="scrollTop()"
-      >
-        <Icon icon="ic:round-vertical-align-top" />
-      </div>
-    </Transition>
-  </div>
+  </LayoutDefault>
 </template>
 
 <script lang="ts" setup>
-import {
-  addTodoAPI,
-  deleteTodoAPI,
-  getTodoAPI,
-  logoutAPI,
-  toggleTodoAPI,
-  updateTodoAPI
-} from '@/api'
-import { useCommonStore, useStyleStore } from '@/stores'
+import { addTodoAPI, deleteTodoAPI, getTodoAPI, toggleTodoAPI, updateTodoAPI } from '@/api'
+import { useCommonStore } from '@/stores'
 import type { Todo } from '@/types'
 import { replaceParams } from '@/utils/url'
-import { useNow, useTextareaAutosize, useWindowScroll, useWindowSize } from '@vueuse/core'
+import { useNow, useTextareaAutosize } from '@vueuse/core'
 
 /* 全局屬性 */
 const commonStore = useCommonStore()
-const useStyle = useStyleStore()
-const router = useRouter()
-const Swal = getCurrentInstance()?.proxy?.$Swal
 const dayjs = getCurrentInstance()?.proxy?.$dayjs
+const gsap = getCurrentInstance()?.proxy?.$gsap
 
 /* 當前時間 */
 const now = useNow()
@@ -189,19 +153,9 @@ const amPm = computed(() => {
   return '晚上好'
 })
 
-/* 至頂 */
-const { height } = useWindowSize()
-const { y } = useWindowScroll({ behavior: 'smooth' })
-const scrollTop = () => {
-  y.value = 0
-}
-// 至頂: 按鈕顯示
-const scrollTopIsShow = computed(() => y.value > height.value / 2)
-
 /* API 狀態 */
 const apiFetching = computed(
   () =>
-    logoutFetching.value ||
     addTodoFetching.value ||
     getTodoFetching.value ||
     deleteTodoFetching.value ||
@@ -209,59 +163,62 @@ const apiFetching = computed(
     updateTodoFetching.value
 )
 
-/* 登出 API */
-const { isFetching: logoutFetching, execute: logoutExecute } = logoutAPI({
-  afterFetch({ data }) {
-    commonStore.auth = {
-      token: '',
-      nickname: ''
-    }
-    router.push({ name: 'login' })
-    return { data }
-  },
-  onFetchError({ data }) {
-    Swal?.fire({
-      title: '驗證失敗',
-      text: '請重新登入',
-      icon: 'warning',
-      confirmButtonText: '確認',
-      confirmButtonColor: useStyle.confirmButtonColor,
-      allowOutsideClick: false,
-      willClose: () => {
-        commonStore.auth = {
-          token: '',
-          nickname: ''
-        }
-        router.push({ name: 'login' })
-      }
-    })
-    return data
-  }
-})
-
 /* Todo */
 const TodoList: Ref<Todo[]> = ref([])
 const currentTodo: Ref<Todo> = ref({} as Todo)
 const currentIndex: Ref<number> = ref(-1)
 
+// Todo: 動效
+const beforeEnter = (el: any) => {
+  gsap?.set(el, {
+    x: -80,
+    opacity: 0
+  })
+}
+const enter = (el: any, done: any) => {
+  gsap?.to(el, {
+    duration: 0.3,
+    x: 0,
+    opacity: 1,
+    ease: 'power1.in',
+    onComplete: done
+  })
+}
+const beforeLeave = (el: any) => {
+  gsap?.set(el, {
+    top: `${el.offsetTop}px`
+  })
+}
+const leave = (el: any, done: any) => {
+  gsap?.to(el, {
+    duration: 0.3,
+    x: 80,
+    opacity: 0,
+    ease: 'power1.out',
+    onComplete: done
+  })
+}
+
 // Todo: 取得全部代辦 API
 const { isFetching: getTodoFetching, execute: getTodoExecute } = getTodoAPI({
   immediate: true,
   afterFetch({ data }) {
-    TodoList.value = data.data.map((i: Todo[]) => ({
-      editTodoRefs: null,
-      autosize: null,
-      tempContent: '',
-      edit: false,
-      ...i
-    }))
+    TodoList.value = data.data
+      .map((i: Todo[]) => ({
+        editTodoRefs: null,
+        autosize: null,
+        tempContent: '',
+        edit: false,
+        ...i
+      }))
+      .reverse()
 
     return { data }
   }
 })
 
 // Todo: 新增代辦 - 輸入框自動大小
-const { textarea: addTodoRefs, input: addTodoData } = useTextareaAutosize()
+const { textarea: addTodoRefs, input: addTodoData } = useTextareaAutosize({ input: ref('') })
 // Todo: 新增代辦 API
 const { isFetching: addTodoFetching, execute: addTodoExecute } = addTodoAPI({
   afterFetch({ data }) {
@@ -270,6 +227,10 @@ const { isFetching: addTodoFetching, execute: addTodoExecute } = addTodoAPI({
     return { data }
   }
 }).post(computed(() => ({ content: addTodoData.value })))
+// Todo: 新增代辦 - Enter送出/換行
+const handleKeyDown = (event: any) => {
+  if (event.ctrlKey && event.key === 'Enter') return addTodoExecute()
+}
 
 // Todo: 刪除代辦
 const deleteTodo = async (todo: Todo, index: number) => {
@@ -355,22 +316,11 @@ const { isFetching: updateTodoFetching, execute: updateTodoExecute } = updateTod
 </script>
 
 <style lang="scss" scoped>
-.my-bg {
-  background-color: #fff;
-  background-image: linear-gradient(90deg, rgb(243 244 246) 1px, transparent 0),
-    linear-gradient(180deg, rgb(243 244 246) 1px, transparent 0);
-  background-position-x: center;
-  background-position-y: -1px;
-  background-size: 45px 45px;
+.todo-list-leave-active {
+  position: absolute;
 }
 
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
+.todo-list-move {
+  transition: all 0.3s ease-in-out;
 }
 </style>

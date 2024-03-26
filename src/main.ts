@@ -1,3 +1,4 @@
+/* eslint-disable vue/multi-word-component-names */
 import './assets/style.css'
 
 import { createPinia } from 'pinia'
@@ -21,6 +22,7 @@ configure({
 setLocale('zh_TW') // 設定預設語系
 
 import dayjs from '@/plugins/dayjs'
+import gsap from '@/plugins/gsap'
 import Swal from '@/plugins/sweetalert2'
 import { Icon } from '@iconify/vue'
 
@@ -34,10 +36,10 @@ app.use(router)
 app.component('ErrorMessage', ErrorMessage)
 app.component('VField', Field)
 app.component('VForm', Form)
-// eslint-disable-next-line vue/multi-word-component-names
 app.component('Icon', Icon)
 
 app.use(dayjs)
 app.use(Swal)
+app.use(gsap)
 
 app.mount('#app')
