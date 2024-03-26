@@ -1,10 +1,10 @@
 import { authAPI } from '@/api'
 import { useCommonStore, useStyleStore } from '@/stores'
 import Swal from 'sweetalert2'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(),
   routes: [
     {
       path: '/',

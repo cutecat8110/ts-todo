@@ -12,6 +12,5 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     UIButton: typeof import('./components/ui/UIButton.vue')['default']
     UIScrollTop: typeof import('./components/ui/UIScrollTop.vue')['default']
-    UITop: typeof import('./components/ui/UITop.vue')['default']
   }
 }
