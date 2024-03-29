@@ -35,7 +35,7 @@
             v-model.trim="fromData.password"
             :class="[
               errors.password ? 'ring-red-600' : 'ring-gray-300 focus:ring-blue-600 ',
-              'mt-2 w-full rounded  px-4 py-2 outline-none ring-1 ring-inset'
+              'mt-2 w-full rounded-md px-4 py-2 outline-none ring-1 ring-inset'
             ]"
             name="password"
             label="密碼"

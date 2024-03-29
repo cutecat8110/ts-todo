@@ -28,17 +28,16 @@
         <h6 class="text-sm font-bold text-gray-600">Copyright © 2024 by Hao</h6>
       </div>
     </footer>
-
-    <UIScrollTop />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { logoutAPI } from '@/api'
-import { useCommonStore, useStyleStore } from '@/stores'
+import { useCommonStore, useStyleStore, useMessageStore } from '@/stores'
 
 /* 全局屬性 */
 const commonStore = useCommonStore()
+const messageStore = useMessageStore()
 const useStyle = useStyleStore()
 const router = useRouter()
 const Swal = getCurrentInstance()?.proxy?.$Swal
@@ -51,6 +50,9 @@ const { isFetching: logoutFetching, execute: logoutExecute } = logoutAPI({
       nickname: ''
     }
     router.push({ name: 'login' })
+    messageStore.info({
+      message: `${data.message}.`
+    })
     return { data }
   },
   onFetchError({ data }) {

@@ -5,9 +5,9 @@
       textSize,
       cssShape,
       props.trailing && 'flex-row-reverse',
-      props.round ? 'rounded-full' : 'rounded',
+      props.round ? 'rounded-full' : 'rounded-md',
       props.block && 'w-full min-w-full',
-      'flex items-center justify-center gap-2 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-75'
+      'flex items-center justify-center gap-2 font-medium transition-colors disabled:opacity-75'
     ]"
     type="button"
   >
@@ -56,7 +56,8 @@ const cssColor = computed<string>(() => {
       darkGray: 'bg-gray-600 text-white hover:bg-gray-700 disabled:bg-gray-600',
       blue: 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-600',
       green: 'bg-green-600 text-white hover:bg-green-700 disabled:bg-green-600',
-      red: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-600'
+      red: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-600',
+      yellow: 'bg-yellow-500 text-white hover:bg-yellow-600 disabled:bg-yellow-500'
     },
     outline: {
       default:
@@ -68,7 +69,9 @@ const cssColor = computed<string>(() => {
       blue: 'bg-transparent text-blue-600 ring-1 ring-inset ring-current hover:bg-blue-50 disabled:bg-transparent',
       green:
         'bg-transparent text-green-600 ring-1 ring-inset ring-current hover:bg-green-50 disabled:bg-transparent',
-      red: 'bg-transparent text-red-600 ring-1 ring-inset ring-current hover:bg-red-50 disabled:bg-transparent'
+      red: 'bg-transparent text-red-600 ring-1 ring-inset ring-current hover:bg-red-50 disabled:bg-transparent',
+      yellow:
+        'bg-transparent text-yellow-500 ring-1 ring-inset ring-current hover:bg-yellow-50 disabled:bg-transparent'
     },
     link: {
       default:
@@ -80,7 +83,9 @@ const cssColor = computed<string>(() => {
       blue: 'text-blue-600 underline-offset-4 hover:text-blue-700 hover:underline disabled:text-blue-600 disabled:no-underline',
       green:
         'text-green-600 underline-offset-4 hover:text-green-700 hover:underline disabled:text-green-600 disabled:no-underline',
-      red: 'text-red-600 underline-offset-4 hover:text-red-700 hover:underline disabled:text-red-600 disabled:no-underline'
+      red: 'text-red-600 underline-offset-4 hover:text-red-700 hover:underline disabled:text-red-600 disabled:no-underline',
+      yellow:
+        'text-yellow-500 underline-offset-4 hover:text-yellow-600 hover:underline disabled:text-yellow-500 disabled:no-underline'
     },
     text: {
       default:
@@ -92,7 +97,9 @@ const cssColor = computed<string>(() => {
       blue: 'text-blue-600 underline-offset-4 hover:text-blue-700 disabled:text-blue-600 disabled:no-underline',
       green:
         'text-green-600 underline-offset-4 hover:text-green-700 disabled:text-green-600 disabled:no-underline',
-      red: 'text-red-600 underline-offset-4 hover:text-red-700 disabled:text-red-600 disabled:no-underline'
+      red: 'text-red-600 underline-offset-4 hover:text-red-700 disabled:text-red-600 disabled:no-underline',
+      yellow:
+        'text-yellow-500 underline-offset-4 hover:text-yellow-600 disabled:text-yellow-500 disabled:no-underline'
     }
   }[props.variant][props.color]
 })
