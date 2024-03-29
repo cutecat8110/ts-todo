@@ -1,5 +1,5 @@
 <template>
-  <div class="container flex min-h-screen items-center justify-center py-12">
+  <div class="login-view">
     <VForm
       ref="formRefs"
       v-slot="{ errors }"
@@ -109,3 +109,9 @@ const { isFetching: apiFetching, execute: loginExecute } = loginAPI({
   }
 }).post(fromData.value)
 </script>
+
+<style lang="scss" scoped>
+.login-view {
+  @apply container flex min-h-screen items-center justify-center py-12;
+}
+</style>

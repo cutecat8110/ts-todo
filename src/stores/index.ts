@@ -1,4 +1,3 @@
 export * from './common'
-export * from './style'
 export * from './message'
-
+export * from './style'

@@ -1,5 +1,5 @@
 <template>
-  <div class="my-bg flex min-h-screen flex-col">
+  <div class="layout-default">
     <!-- Header -->
     <header class="sticky top-0 z-10 border-b bg-white/90 backdrop-blur-sm">
       <div
@@ -77,7 +77,8 @@ const { isFetching: logoutFetching, execute: logoutExecute } = logoutAPI({
 </script>
 
 <style lang="scss" scoped>
-.my-bg {
+.layout-default {
+  @apply flex min-h-screen flex-col;
   background-color: #fff;
   background-image: linear-gradient(90deg, rgb(243 244 246) 1px, transparent 0),
     linear-gradient(180deg, rgb(243 244 246) 1px, transparent 0);

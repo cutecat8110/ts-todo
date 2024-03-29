@@ -1,5 +1,5 @@
 <template>
-  <li class="w-screen text-center" :style="paddingX">
+  <li class="ui-message" :style="paddingX">
     <div
       class="pointer-events-auto inline-flex items-center rounded-md bg-white/90 p-1 font-bold text-gray-600 shadow ring-1 ring-inset ring-gray-200"
     >
@@ -35,6 +35,7 @@ const props = defineProps({
   message: { type: {} as PropType<UIMessageConfig>, required: true }
 })
 
+/* 全局屬性 */
 const messageStore = useMessageStore()
 
 /* 方法: 關閉 */
@@ -42,30 +43,21 @@ const handleClose = () => {
   messageStore.close(props.message.id)
 }
 
-/* 關閉計時 */
+/* 存在時長 */
 const timer = ref<number | null>(null)
-
-const clearTimer = () => {
+onMounted(() => {
+  if (props.message.duration > 0) {
+    timer.value = setTimeout(handleClose, props.message.duration)
+  }
+})
+onUnmounted(() => {
   if (timer.value !== null) {
     clearTimeout(timer.value)
     timer.value = null
   }
-}
-
-// 根據 duration 控制存在時長
-const startTimer = () => {
-  if (props.message.duration > 0) {
-    timer.value = setTimeout(handleClose, props.message.duration)
-  }
-}
-
-onMounted(() => {
-  startTimer()
-})
-onUnmounted(() => {
-  clearTimer()
 })
 
+/* 間距 */
 const paddingX = computed(() => {
   return document.documentElement.scrollHeight > window.innerHeight
     ? {
@@ -75,7 +67,7 @@ const paddingX = computed(() => {
     : { padding: '0 0.75rem' }
 })
 
-/* 狀態 Icon */
+/* Icon 狀態 */
 const typeIcon = computed(() => {
   switch (props.message.type) {
     case 'success':
@@ -90,7 +82,7 @@ const typeIcon = computed(() => {
       return ''
   }
 })
-
+// Icon 顏色
 const iconColor = computed(() => {
   switch (props.message.type) {
     case 'success':
@@ -104,3 +96,9 @@ const iconColor = computed(() => {
   }
 })
 </script>
+
+<style lang="scss" scoped>
+.ui-message {
+  @apply w-screen text-center;
+}
+</style>

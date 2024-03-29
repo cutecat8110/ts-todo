@@ -1,6 +1,6 @@
 <template>
   <LayoutDefault>
-    <main class="flex-1 py-10">
+    <main class="todo-view">
       <div class="container lg:max-w-[50rem]">
         <!-- 歡迎訊息 -->
         <div class="text-2xl font-black">
@@ -340,6 +340,10 @@ const { isFetching: updateTodoFetching, execute: updateTodoExecute } = updateTod
 </script>
 
 <style lang="scss" scoped>
+.todo-view {
+  @apply flex-1 py-10;
+}
+
 .progress-bar,
 .todo-list-move,
 .todo-list-enter-active,
