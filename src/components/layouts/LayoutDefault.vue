@@ -24,9 +24,7 @@
 
     <!-- Footer -->
     <footer class="border-t bg-white">
-      <div class="container flex h-14 items-center justify-center">
-        <h6 class="text-sm font-bold text-gray-600">Copyright © 2024 by Hao</h6>
-      </div>
+      <PageCopyright class="container h-14" />
     </footer>
   </div>
 </template>

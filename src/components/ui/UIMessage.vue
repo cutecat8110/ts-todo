@@ -77,7 +77,7 @@ const typeIcon = computed(() => {
     case 'warn':
       return 'ic:round-error'
     case 'info':
-      return 'ic:round-error'
+      return 'ic:round-info'
     default:
       return ''
   }

@@ -53,7 +53,7 @@ const cssColor = computed<string>(() => {
       default:
         'bg-white text-gray-300 ring-1 ring-inset ring-current hover:text-blue-600 disabled:bg-white',
       lightGray: 'bg-gray-300 text-white hover:bg-gray-400 disabled:bg-gray-300',
-      darkGray: 'bg-gray-600 text-white hover:bg-gray-700 disabled:bg-gray-600',
+      darkGray: 'bg-gray-500 text-white hover:bg-gray-600 disabled:bg-gray-500',
       blue: 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-600',
       green: 'bg-green-600 text-white hover:bg-green-700 disabled:bg-green-600',
       red: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-600',
@@ -65,7 +65,7 @@ const cssColor = computed<string>(() => {
       lightGray:
         'bg-transparent text-gray-300 ring-1 ring-inset ring-current hover:bg-gray-50 disabled:bg-transparent',
       darkGray:
-        'bg-transparent text-gray-600 ring-1 ring-inset ring-current hover:bg-gray-50 disabled:bg-transparent',
+        'bg-transparent text-gray-500 ring-1 ring-inset ring-current hover:bg-gray-50 disabled:bg-transparent',
       blue: 'bg-transparent text-blue-600 ring-1 ring-inset ring-current hover:bg-blue-50 disabled:bg-transparent',
       green:
         'bg-transparent text-green-600 ring-1 ring-inset ring-current hover:bg-green-50 disabled:bg-transparent',
@@ -79,7 +79,7 @@ const cssColor = computed<string>(() => {
       lightGray:
         'text-gray-300 underline-offset-4 hover:text-gray-400 hover:underline disabled:text-gray-300 disabled:no-underline',
       darkGray:
-        'text-gray-600 underline-offset-4 hover:text-gray-700 hover:underline disabled:text-gray-600 disabled:no-underline',
+        'text-gray-500 underline-offset-4 hover:text-gray-600 hover:underline disabled:text-gray-500 disabled:no-underline',
       blue: 'text-blue-600 underline-offset-4 hover:text-blue-700 hover:underline disabled:text-blue-600 disabled:no-underline',
       green:
         'text-green-600 underline-offset-4 hover:text-green-700 hover:underline disabled:text-green-600 disabled:no-underline',
@@ -93,7 +93,7 @@ const cssColor = computed<string>(() => {
       lightGray:
         'text-gray-300 underline-offset-4 hover:text-gray-400 disabled:text-gray-300 disabled:no-underline',
       darkGray:
-        'text-gray-600 underline-offset-4 hover:text-gray-700 disabled:text-gray-600 disabled:no-underline',
+        'text-gray-500 underline-offset-4 hover:text-gray-600 disabled:text-gray-500 disabled:no-underline',
       blue: 'text-blue-600 underline-offset-4 hover:text-blue-700 disabled:text-blue-600 disabled:no-underline',
       green:
         'text-green-600 underline-offset-4 hover:text-green-700 disabled:text-green-600 disabled:no-underline',

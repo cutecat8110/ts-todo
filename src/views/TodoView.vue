@@ -3,13 +3,13 @@
     <main class="todo-view">
       <div class="container lg:max-w-[50rem]">
         <!-- 歡迎訊息 -->
-        <div class="text-2xl font-black">
+        <div class="text-2xl font-bold">
           {{ amPm }}，{{ commonStore.auth.nickname }}，歡迎回來👋
         </div>
 
         <!-- 新增代辦輸入框 -->
         <div class="mt-4 space-y-6 rounded-xl bg-gray-100 p-6">
-          <div class="flex flex-wrap items-center justify-between font-black text-gray-600">
+          <div class="flex flex-wrap items-center justify-between font-bold text-gray-600">
             <!-- 當前日期 -->
             <div class="flex flex-wrap gap-2 text-[2.5rem] leading-none">
               {{ $dayjs(now).format('DD') }}
@@ -53,7 +53,7 @@
         </div>
 
         <div
-          class="relative mt-4 h-6 overflow-hidden rounded-full bg-gray-300 text-sm font-black tracking-wide text-white"
+          class="relative mt-4 h-6 overflow-hidden rounded-full bg-gray-300 text-sm font-bold tracking-wide text-white"
         >
           <div
             v-if="TodoList.length !== 0"
@@ -74,7 +74,7 @@
             :class="[
               todo.status && !todo.edit && 'line-through',
               todo.status ? 'border-transparent bg-gray-100 text-gray-500' : 'bg-white',
-              'flex w-full flex-wrap items-center gap-y-2 overflow-hidden rounded-xl border-2 p-[0.625rem] px-4 font-black transition-all hover:border-gray-300 hover:shadow'
+              'flex w-full flex-wrap items-center gap-y-2 overflow-hidden rounded-xl border-2 p-[0.625rem] px-4  transition-all hover:border-gray-300 hover:shadow'
             ]"
           >
             <!-- 代辦完成狀態 -->
@@ -345,10 +345,16 @@ const { isFetching: updateTodoFetching, execute: updateTodoExecute } = updateTod
 }
 
 .progress-bar,
-.todo-list-move,
-.todo-list-enter-active,
-.todo-list-leave-active {
+.todo-list-move {
   transition: all 0.3s ease-in-out;
+}
+
+.todo-list-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.todo-list-leave-active {
+  transition: all 0.2s ease-in;
 }
 
 .todo-list-enter-from {

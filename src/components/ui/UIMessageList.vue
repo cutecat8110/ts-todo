@@ -1,5 +1,5 @@
 <template>
-  <TransitionGroup class="ui-message-list" name="list" tag="ul">
+  <TransitionGroup class="ui-message-list" name="ui-message-list" tag="ul">
     <UIMessage
       v-for="message in messageStore.messages"
       :key="message.id"
@@ -22,23 +22,29 @@ const messageStore = useMessageStore()
   @apply pointer-events-none fixed top-6 z-[11] space-y-2;
 }
 
-.list-move,
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.3s ease;
+.ui-message-list-move {
+  transition: all 0.2s ease-in-out;
 }
 
-.list-enter-from {
+.ui-message-list-enter-active {
+  transition: all 0.2s ease-out;
+}
+
+.ui-message-list-leave-active {
+  transition: all 0.15s ease-in;
+}
+
+.ui-message-list-enter-from {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(1.5rem);
 }
 
-.list-leave-to {
+.ui-message-list-leave-to {
   opacity: 0;
-  transform: translateY(-30px);
+  transform: translateY(1.5rem);
 }
 
-.list-leave-active {
+.ui-message-list-leave-active {
   position: absolute;
 }
 </style>
