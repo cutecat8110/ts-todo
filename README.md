@@ -1,16 +1,20 @@
 # TS Todo
 
-> 這是一個 Vue3 + TypeScript 的練習專案，提供註冊功能的待辦事項應用程式。
+> 這是一個 Vue3 + TypeScript 的練習網頁，包含用戶註冊和待辦任務等功能。
 
-<br />
+![](https://cutecat8110.github.io/ts-todo/demo.png)
+
+</div>
 
 ## 🌸 Demo
+
+[API 文件](https://todolist-api.hexschool.io/doc/)
 
 [GitHub Page](https://cutecat8110.github.io/ts-todo/)
 
 <br />
 
-## 🌈 安裝與使用
+## 🚀 安裝和使用
 
 ### 系統需求
 
@@ -46,42 +50,24 @@ npm run dev
 
 ## 🔨 核心技術
 
-- [Vue.js 3](https://vuejs.org/)
+- [**Vue.js 3**](https://vuejs.org/)**:** `JavaScript 框架`
 
-  > JavaScript 框架
+- [**TypeScript**](https://www.typescriptlang.org/)**:** `JavaScript 的超集`
 
-- [TypeScript](https://www.typescriptlang.org/)
+- [**Pinia**](https://pinia.vuejs.org/)**:** `Vue.js 的狀態管理庫`
 
-  > JavaScript 的超集
-
-- [Pinia](https://pinia.vuejs.org/)
-
-  > Vue.js 的狀態管理庫
-
-- [Tailwind CSS](https://tailwindcss.com/)
-
-  > CSS 框架
+- [**Tailwind CSS**](https://tailwindcss.com/)**:** `CSS 框架`
 
 <br />
 
 ## 🛠️ 擴展套件
 
-- [SweetAlert2](https://sweetalert2.github.io/)
+- [**SweetAlert2**](https://sweetalert2.github.io/)**:** `美觀且可定製的訊息彈框`
 
-  > 美觀且可定製的訊息彈框
+- [**VeeValidate**](https://vee-validate.logaretm.com/v4/)**:** `表單驗證庫`
 
-- [VeeValidate](https://vee-validate.logaretm.com/v4/)
+- [**Day.js**](https://day.js.org/)**:** `輕量級日期和時間處理庫`
 
-  > 表單驗證庫
+- [**VueUse**](https://vueuse.org/)**:** `針對 Vue 3 Composition API 的實用函數庫`
 
-- [Day.js](https://day.js.org/)
-
-  > 輕量級日期和時間處理庫
-
-- [VueUse](https://vueuse.org/)
-
-  > 針對 Vue 3 Composition API 的實用函數庫
-
-- [Iconify](https://iconify.design/)
-
-  > 開源的圖標集合
+- [**Iconify**](https://iconify.design/)**:** `開源的圖標集合`
