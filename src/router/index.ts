@@ -1,6 +1,6 @@
 import { authAPI } from '@/api'
-import { useCommonStore, useStyleStore } from '@/stores'
-import Swal from 'sweetalert2'
+import { useCommonStore, useMessageStore } from '@/stores'
+import { apiFailure } from '@/utils/api-error'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({
@@ -25,30 +25,17 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  if (to.path === '/') {
-    const commonStore = useCommonStore()
-    if (commonStore.auth.token == '') {
-      return { name: 'login' }
-    }
-    const { error } = await authAPI({ immediate: true })
-    if (error.value) {
-      const useStyle = useStyleStore()
-      const result = await Swal.fire({
-        title: '驗證失敗',
-        text: '請重新登入',
-        icon: 'warning',
-        confirmButtonText: '確認',
-        confirmButtonColor: useStyle.confirmButtonColor,
-        allowOutsideClick: false
-      })
-      if (result.value) {
-        commonStore.auth = {
-          token: '',
-          nickname: ''
-        }
-        return { name: 'login' }
-      }
-    }
+  if (to.name !== 'todo') return
+  const commonStore = useCommonStore()
+  const token = commonStore.auth.token
+  if (!token) return { name: 'login' }
+  const { error, data, statusCode } = await authAPI({ immediate: true })
+  if (commonStore.auth.token !== token) return false
+  if (error.value || data.value?.status === false) {
+    const expired = statusCode.value === 401
+    if (expired) commonStore.auth = { token: '', nickname: '' }
+    useMessageStore().error({ message: expired ? '登入已失效，請重新登入。' : apiFailure(data.value, error.value, statusCode.value).message })
+    return { name: 'login' }
   }
 })
 

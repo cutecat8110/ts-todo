@@ -1,0 +1,41 @@
+[
+  {
+    "test": "demo login",
+    "status": 200
+  },
+  {
+    "test": "checkout",
+    "status": 200
+  },
+  {
+    "test": "load existing list",
+    "status": 200,
+    "count": 0
+  },
+  {
+    "test": "create",
+    "status": 201
+  },
+  {
+    "test": "update",
+    "status": 200
+  },
+  {
+    "test": "toggle",
+    "status": 200
+  },
+  {
+    "test": "persistence",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "test": "cleanup exact QA id",
+    "id": "-P3Oce100P2aicm0oNz9",
+    "status": 200
+  },
+  {
+    "test": "cleanup verified",
+    "passed": true
+  }
+]

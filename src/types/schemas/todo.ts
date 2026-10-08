@@ -1,7 +1,6 @@
 export interface Todo {
-  editTodoRefs: HTMLTextAreaElement
-  todoRefs: HTMLLIElement
-  autosize: any
+  editTodoRefs: HTMLTextAreaElement | null
+  todoRefs: HTMLLIElement | null
   content: string
   createTime: number
   id: string

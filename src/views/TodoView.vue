@@ -3,7 +3,7 @@
     <main class="todo-view">
       <div class="container lg:max-w-[50rem]">
         <!-- 歡迎訊息 -->
-        <div class="text-2xl font-bold">
+        <div class="break-words text-2xl font-bold">
           {{ amPm }}，{{ commonStore.auth.nickname }}，歡迎回來👋
         </div>
 
@@ -35,17 +35,18 @@
               v-model.trim="addTodoData"
               :class="[
                 addTodoDataError ? 'ring-red-600' : 'ring-gray-300 focus:ring-blue-600 ',
-                'flex-1 resize-none rounded-md px-4 py-2 outline-none ring-1 ring-inset'
+                'min-w-0 flex-1 resize-none rounded-md px-4 py-2 outline-none ring-1 ring-inset'
               ]"
               placeholder="Todo"
-              :disabled="addTodoFetching"
-              @keydown="(event) => onKeyboardSubmit(event, -1, () => addTodoExecute())"
+              aria-label="新增待辦事項"
+              :disabled="addTodoFetching || loading || !!loadError"
+              @keydown="(event) => onKeyboardSubmit(event, onTodoSubmit)"
             />
             <UIButton
               label="新增"
               color="blue"
               size="lg"
-              :disabled="addTodoFetching"
+              :disabled="addTodoFetching || loading || !!loadError"
               @click="onTodoSubmit()"
             />
             <div v-if="addTodoDataError" class="w-full text-red-600">Todo 為必填</div>
@@ -65,10 +66,16 @@
           </span>
         </div>
 
+        <p v-if="loading" class="mt-4 text-center text-gray-500" role="status">載入中…</p>
+        <div v-else-if="loadError" class="mt-4 text-center" role="alert">
+          <p class="text-red-600">{{ loadError }}</p>
+          <UIButton class="mx-auto mt-2" label="重新載入" color="blue" variant="link" @click="load" />
+        </div>
+        <p v-else-if="!TodoList.length" class="mt-4 text-center text-gray-500">尚無待辦事項</p>
         <!-- 代辦清單 -->
         <TransitionGroup class="relative mt-4 space-y-4" name="todo-list" tag="ul">
           <li
-            v-for="(todo, index) in TodoList"
+            v-for="todo in TodoList"
             :ref="(el) => (todo.todoRefs = el as HTMLLIElement)"
             :key="todo.id"
             :class="[
@@ -85,11 +92,10 @@
               size="lg"
               square
               variant="text"
-              :disabled="
-                currentIndex == index &&
-                (updateTodoFetching || deleteTodoFetching || toggleTodoFetching)
-              "
-              @click="!todo.edit && handleTodo(todo, index, 'toggle')"
+              :aria-label="todo.status ? '標記為未完成' : '標記為完成'"
+              :aria-pressed="todo.status"
+              :disabled="pending.has(todo.id) || todo.edit"
+              @click="handleTodo(todo, 'toggle')"
             />
 
             <!-- 編輯代辦輸入框 -->
@@ -99,13 +105,15 @@
               :class="[
                 todo.edit ? 'bg-white ring-1 ring-inset ' : 'cursor-default',
                 todo.edit && todo.error ? 'ring-red-600' : 'ring-gray-300 focus:ring-blue-600',
-                'flex-1 resize-none rounded-md bg-transparent px-4 py-2 outline-none'
+                'min-w-0 flex-1 resize-none rounded-md bg-transparent px-4 py-2 outline-none'
               ]"
+              :aria-label="todo.edit ? '編輯待辦事項' : '待辦事項'"
               placeholder="Todo"
+              @input="todo.error = false"
               :readonly="!todo.edit"
-              :disabled="currentIndex == index && updateTodoFetching"
+              :disabled="pending.has(todo.id)"
               @keydown="
-                (event) => onKeyboardSubmit(event, index, () => handleTodo(todo, index, 'update'))
+                (event) => onKeyboardSubmit(event, () => handleTodo(todo, 'update'))
               "
             />
 
@@ -115,17 +123,19 @@
               <template v-if="!todo.edit">
                 <UIButton
                   icon="ic:round-mode-edit-outline"
+                  aria-label="編輯待辦"
                   square
                   variant="text"
-                  :disabled="currentIndex == index && (deleteTodoFetching || toggleTodoFetching)"
-                  @click="editTodoToggle(index)"
+                  :disabled="pending.has(todo.id)"
+                  @click="editTodoToggle(todo)"
                 />
                 <UIButton
                   icon="ic:baseline-delete"
+                  aria-label="刪除待辦"
                   square
                   variant="text"
-                  :disabled="currentIndex == index && (deleteTodoFetching || toggleTodoFetching)"
-                  @click="handleTodo(todo, index, 'delete')"
+                  :disabled="pending.has(todo.id)"
+                  @click="handleTodo(todo, 'delete')"
                 />
               </template>
 
@@ -134,18 +144,20 @@
                 <UIButton
                   color="lightGray"
                   icon="ic:round-close"
+                  aria-label="取消編輯"
                   square
                   variant="text"
-                  :disabled="currentIndex == index && updateTodoFetching"
-                  @click="editTodoToggle(index)"
+                  :disabled="pending.has(todo.id)"
+                  @click="editTodoToggle(todo)"
                 />
                 <UIButton
                   color="blue"
                   icon="ic:round-done"
+                  aria-label="儲存待辦"
                   square
                   variant="text"
-                  :disabled="currentIndex == index && updateTodoFetching"
-                  @click="handleTodo(todo, index, 'update')"
+                  :disabled="pending.has(todo.id)"
+                  @click="handleTodo(todo, 'update')"
                 />
               </template>
             </div>
@@ -158,185 +170,90 @@
 </template>
 
 <script lang="ts" setup>
-import { addTodoAPI, deleteTodoAPI, getTodoAPI, toggleTodoAPI, updateTodoAPI } from '@/api'
 import { useCommonStore, useMessageStore } from '@/stores'
+import { useTodos } from '@/composables/useTodos'
 import type { Todo } from '@/types'
-import { replaceParams } from '@/utils/url'
-import { useNow, useTextareaAutosize } from '@vueuse/core'
+import { useNow, useTextareaAutosize, useWindowSize } from '@vueuse/core'
 
-/* 全局屬性 */
 const commonStore = useCommonStore()
 const messageStore = useMessageStore()
+const router = useRouter()
 const dayjs = getCurrentInstance()?.proxy?.$dayjs
-
-/* 當前時間 */
-const now = useNow()
-
-/* 問候語 */
-const amPm = computed<string>(() => {
-  const currentHour = dayjs?.(now.value).hour()
-
-  if (currentHour === undefined) return ''
-  if (currentHour < 4) return '午夜好'
-  if (currentHour < 12) return '早上好'
-  if (currentHour < 18) return '下午好'
-  if (currentHour < 21) return '傍晚好'
+const now = useNow({ interval: 1000 })
+const { width: windowWidth } = useWindowSize()
+const amPm = computed(() => {
+  const hour = dayjs?.(now.value).hour()
+  if (hour === undefined) return ''
+  if (hour < 4) return '午夜好'
+  if (hour < 12) return '早上好'
+  if (hour < 18) return '下午好'
+  if (hour < 21) return '傍晚好'
   return '晚上好'
 })
-
-/* 待辦事項 */
-const TodoList = ref<Todo[]>([])
-const doneTodos = computed<number>(() => TodoList.value.filter((i) => i.status == true).length)
-const currentTodo = ref<Todo>({} as Todo)
-const currentIndex = ref<number>(-1)
-
-// 取得全部代辦 API
-const { execute: getTodoExecute } = getTodoAPI({
-  immediate: true,
-  afterFetch({ data }) {
-    TodoList.value = data.data
-      .map((i: any) => ({
-        editTodoRefs: null,
-        todoRefs: null,
-        autosize: null,
-        tempContent: i.content,
-        edit: false,
-        error: false,
-        ...i
-      }))
-      .reverse()
-    nextTick(() => {
-      TodoList.value.forEach((_, i) => {
-        TodoList.value[i].autosize = useTextareaAutosize({
-          element: TodoList.value[i].editTodoRefs,
-          input: TodoList.value[i].tempContent
-        })
-      })
-      addTodoRefs.value.focus()
-    })
-    return { data }
+const token = commonStore.auth.token
+const { todos: TodoList, loading, adding: addTodoFetching, loadError, pending, load, add, mutate } = useTodos(
+  (error) => {
+    if (error.status === 401 && commonStore.auth.token === token) {
+      commonStore.auth = { token: '', nickname: '' }
+      router.replace({ name: 'login' })
+      messageStore.error({ message: '登入已失效，請重新登入。' })
+    } else messageStore.error({ message: error.message })
+  },
+  (action) => {
+    const messages: Record<string, string> = { add: 'Todo 已新增.', delete: 'Todo 已刪除.', toggle: 'Todo 狀態更新.', update: 'Todo 更新成功.' }
+    if (action === 'delete') messageStore.warn({ message: messages[action] })
+    else messageStore.success({ message: messages[action] })
   }
-})
-
-// 新增代辦 - ref/refs 宣告 & 輸入框自動大小
-const { textarea: addTodoRefs, input: addTodoData } = useTextareaAutosize({
-  input: ref<string>('')
-})
-// 新增代辦 - 錯誤訊息
+)
+const doneTodos = computed(() => TodoList.value.filter((todo) => todo.status).length)
+const { textarea: addTodoRefs, input: addTodoData } = useTextareaAutosize({ input: ref('') })
 const addTodoDataError = ref(false)
-// 新增代辦
-const onTodoSubmit = () => {
-  if (addTodoData.value == '') {
+watch(addTodoData, () => { addTodoDataError.value = false })
+
+async function onTodoSubmit() {
+  if (addTodoFetching.value || loading.value) return
+  if (!addTodoData.value.trim()) {
     addTodoDataError.value = true
-    addTodoRefs.value.focus()
+    addTodoRefs.value?.focus()
     return
   }
-  addTodoExecute()
-}
-// 消除錯誤訊息 & 輸入框快捷
-const onKeyboardSubmit = (event: KeyboardEvent, index: number, fn: () => void) => {
-  if (index == -1) {
-    addTodoDataError.value = false
-  } else {
-    TodoList.value[index].error = false
-  }
-  if (event.ctrlKey && event.key === 'Enter') return fn()
-}
-
-// 新增代辦 API
-const { isFetching: addTodoFetching, execute: addTodoExecute } = addTodoAPI({
-  afterFetch({ data }) {
+  if (await add(addTodoData.value)) {
     addTodoData.value = ''
-    messageStore.success({
-      message: `Todo 已新增.`
-    })
-    getTodoExecute()
-    return { data }
-  }
-}).post(computed(() => ({ content: addTodoData.value })))
-
-// 操作代辦
-const handleTodo = (todo: Todo, index: number, action: string) => {
-  currentTodo.value = todo
-  currentIndex.value = index
-
-  switch (action) {
-    case 'delete':
-      deleteTodoExecute()
-      break
-    case 'toggle':
-      toggleTodoExecute()
-      break
-    case 'update':
-      if (TodoList.value[index].tempContent == '') {
-        TodoList.value[index].error = true
-        TodoList.value[index].editTodoRefs.focus()
-        return
-      }
-      updateTodoExecute()
-      break
-
-    default:
-      break
+    addTodoRefs.value?.focus()
   }
 }
-
-// 刪除代辦 API
-const { isFetching: deleteTodoFetching, execute: deleteTodoExecute } = deleteTodoAPI({
-  beforeFetch({ url }) {
-    return { url: replaceParams(url, { id: currentTodo.value.id }) }
-  },
-  afterFetch({ data }) {
-    TodoList.value = TodoList.value.filter((_, i) => i !== currentIndex.value)
-    messageStore.warn({
-      message: `Todo 已刪除.`
-    })
-    return { data }
-  }
-})
-
-// 切換代辦完成狀態 API
-const { isFetching: toggleTodoFetching, execute: toggleTodoExecute } = toggleTodoAPI({
-  beforeFetch({ url }) {
-    return { url: replaceParams(url, { id: currentTodo.value.id }) }
-  },
-  afterFetch({ data }) {
-    TodoList.value[currentIndex.value].status = !currentTodo.value.status
-    messageStore.success({
-      message: `Todo 狀態更新.`
-    })
-    return { data }
-  }
-})
-
-// 切換編輯代辦內容
-const editTodoToggle = (index: number) => {
-  TodoList.value[index].edit = !TodoList.value[index].edit
-  TodoList.value[index].error = false
-  if (TodoList.value[index].edit) {
-    nextTick(() => {
-      TodoList.value[index].editTodoRefs.focus()
-    })
-  } else {
-    TodoList.value[index].autosize.triggerResize()
-    TodoList.value[index].tempContent = TodoList.value[index].content
-  }
+function onKeyboardSubmit(event: KeyboardEvent, submit: () => void) {
+  if (event.isComposing || event.repeat || !(event.ctrlKey || event.metaKey) || event.key !== 'Enter') return
+  event.preventDefault()
+  submit()
 }
-
-// 更新代辦內容 API
-const { isFetching: updateTodoFetching, execute: updateTodoExecute } = updateTodoAPI({
-  beforeFetch({ url }) {
-    return { url: replaceParams(url, { id: currentTodo.value.id }) }
-  },
-  afterFetch({ data }) {
-    TodoList.value[currentIndex.value].content = currentTodo.value.tempContent
-    messageStore.info({
-      message: `Todo ${data.message}.`
-    })
-    editTodoToggle(currentIndex.value)
-    return { data }
+function editTodoToggle(todo: Todo) {
+  if (pending.has(todo.id)) return
+  todo.edit = !todo.edit
+  todo.error = false
+  todo.tempContent = todo.content
+  if (todo.edit) nextTick(() => todo.editTodoRefs?.focus())
+}
+function handleTodo(todo: Todo, action: 'delete' | 'toggle' | 'update') {
+  if (action === 'update') {
+    if (!todo.edit) return
+    if (!todo.tempContent.trim()) {
+      todo.error = true
+      todo.editTodoRefs?.focus()
+      return
+    }
   }
-}).post(computed(() => ({ content: currentTodo.value.tempContent })))
+  mutate(todo, action)
+}
+// Resize after content or edit mode changes, without creating watchers on each refresh.
+watch([() => TodoList.value.map((todo) => [todo.tempContent, todo.edit]), windowWidth], async () => {
+  await nextTick()
+  TodoList.value.forEach((todo) => {
+    const el = todo.editTodoRefs
+    if (el) { el.style.height = 'auto'; el.style.height = `${el.scrollHeight}px` }
+  })
+}, { flush: 'post' })
+onMounted(load)
 </script>
 
 <style lang="scss" scoped>

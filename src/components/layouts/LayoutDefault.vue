@@ -14,7 +14,7 @@
           trailing
           variant="link"
           :disabled="logoutFetching"
-          @click="logoutExecute"
+          @click="!logoutFetching && logoutExecute()"
         />
       </div>
     </header>
@@ -31,14 +31,12 @@
 
 <script lang="ts" setup>
 import { logoutAPI } from '@/api'
-import { useCommonStore, useStyleStore, useMessageStore } from '@/stores'
+import { useCommonStore, useMessageStore } from '@/stores'
 
 /* 全局屬性 */
 const commonStore = useCommonStore()
 const messageStore = useMessageStore()
-const useStyle = useStyleStore()
 const router = useRouter()
-const Swal = getCurrentInstance()?.proxy?.$Swal
 
 /* 登出 API */
 const { isFetching: logoutFetching, execute: logoutExecute } = logoutAPI({
@@ -53,23 +51,11 @@ const { isFetching: logoutFetching, execute: logoutExecute } = logoutAPI({
     })
     return { data }
   },
-  onFetchError({ data }) {
-    Swal?.fire({
-      title: '驗證失敗',
-      text: '請重新登入',
-      icon: 'warning',
-      confirmButtonText: '確認',
-      confirmButtonColor: useStyle.confirmButtonColor,
-      allowOutsideClick: false,
-      willClose: () => {
-        commonStore.auth = {
-          token: '',
-          nickname: ''
-        }
-        router.push({ name: 'login' })
-      }
-    })
-    return data
+  onFetchError({ data, error }) {
+    commonStore.auth = { token: '', nickname: '' }
+    router.replace({ name: 'login' })
+    messageStore.info({ message: '已登出此裝置。' })
+    return { data, error }
   }
 })
 </script>

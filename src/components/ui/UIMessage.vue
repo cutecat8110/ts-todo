@@ -1,9 +1,11 @@
 <template>
   <li class="ui-message" :style="paddingX">
     <div
-      class="pointer-events-auto inline-flex items-center rounded-md bg-white/90 p-1 font-bold text-gray-600 shadow ring-1 ring-inset ring-gray-200"
+      class="pointer-events-auto inline-flex max-w-full items-center rounded-md bg-white/90 p-1 font-bold text-gray-600 shadow ring-1 ring-inset ring-gray-200"
     >
       <UIButton
+        aria-label="關閉通知"
+        class="shrink-0"
         :color="iconColor"
         :icon="typeIcon"
         size="lg"
@@ -11,11 +13,12 @@
         variant="text"
         @click="handleClose"
       />
-      <div :class="[!message.close && 'pr-4', 'py-2 leading-4']">
+      <div :class="[!message.close && 'pr-4', 'min-w-0 break-words py-2 leading-4']">
         {{ message.message }}
       </div>
       <UIButton
         v-if="message.close"
+        aria-label="關閉通知"
         color="lightGray"
         icon="ic:round-close"
         square

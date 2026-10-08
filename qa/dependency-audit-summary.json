@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-08",
+  "counts": {
+    "info": 0,
+    "low": 0,
+    "moderate": 10,
+    "high": 16,
+    "critical": 0,
+    "total": 26
+  },
+  "remaining": {
+    "@typescript-eslint/eslint-plugin": {
+      "severity": "high",
+      "direct": false
+    },
+    "@typescript-eslint/parser": {
+      "severity": "high",
+      "direct": false
+    },
+    "@typescript-eslint/type-utils": {
+      "severity": "high",
+      "direct": false
+    },
+    "@typescript-eslint/typescript-estree": {
+      "severity": "high",
+      "direct": false
+    },
+    "@typescript-eslint/utils": {
+      "severity": "high",
+      "direct": false
+    },
+    "@vue/eslint-config-typescript": {
+      "severity": "moderate",
+      "direct": true
+    },
+    "@vue/language-core": {
+      "severity": "moderate",
+      "direct": false
+    },
+    "ajv": {
+      "severity": "moderate",
+      "direct": false
+    },
+    "brace-expansion": {
+      "severity": "high",
+      "direct": false
+    },
+    "braces": {
+      "severity": "high",
+      "direct": false
+    },
+    "browserslist": {
+      "severity": "high",
+      "direct": false
+    },
+    "cross-spawn": {
+      "severity": "high",
+      "direct": false
+    },
+    "eslint-plugin-vue": {
+      "severity": "moderate",
+      "direct": true
+    },
+    "flatted": {
+      "severity": "high",
+      "direct": false
+    },
+    "glob": {
+      "severity": "high",
+      "direct": false
+    },
+    "immutable": {
+      "severity": "high",
+      "direct": false
+    },
+    "js-yaml": {
+      "severity": "high",
+      "direct": false
+    },
+    "lodash": {
+      "severity": "high",
+      "direct": false
+    },
+    "micromatch": {
+      "severity": "moderate",
+      "direct": false
+    },
+    "minimatch": {
+      "severity": "high",
+      "direct": false
+    },
+    "picomatch": {
+      "severity": "high",
+      "direct": false
+    },
+    "postcss-nested": {
+      "severity": "moderate",
+      "direct": false
+    },
+    "postcss-selector-parser": {
+      "severity": "moderate",
+      "direct": false
+    },
+    "tailwindcss": {
+      "severity": "moderate",
+      "direct": true
+    },
+    "vue-template-compiler": {
+      "severity": "moderate",
+      "direct": false
+    },
+    "vue-tsc": {
+      "severity": "moderate",
+      "direct": true
+    }
+  }
+}

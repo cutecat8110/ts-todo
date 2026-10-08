@@ -1,5 +1,5 @@
 <template>
-  <TransitionGroup class="ui-message-list" name="ui-message-list" tag="ul">
+  <TransitionGroup class="ui-message-list" aria-live="polite" name="ui-message-list" tag="ul">
     <UIMessage
       v-for="message in messageStore.messages"
       :key="message.id"

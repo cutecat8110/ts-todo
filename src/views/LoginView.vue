@@ -5,15 +5,15 @@
         ref="formRefs"
         v-slot="{ errors }"
         class="flex max-w-80 flex-1 flex-col gap-16 pb-16"
-        @submit="loginExecute()"
+        @submit="submit"
       >
         <div class="tracking-widest">
           <h1 class="text-center text-4xl font-bold text-blue-600">TS Todo</h1>
           <h2 class="mt-2 text-center text-sm text-gray-400">Sign in to System</h2>
         </div>
         <div class="space-y-4">
-          <label class="block" for="email">
-            <div class="font-bold">電子信箱</div>
+          <div class="block">
+            <label class="block font-bold" for="email">電子信箱</label>
             <div class="relative">
               <VField
                 id="email"
@@ -26,7 +26,8 @@
                 ]"
                 name="email"
                 label="電子信箱"
-                type="text"
+                type="email"
+                autocomplete="username"
                 rules="required|email"
                 :disabled="apiFetching"
               />
@@ -41,18 +42,20 @@
                   size="sm"
                   square
                   variant="text"
+                  aria-label="自動填入預設"
+                  :disabled="apiFetching"
                   @click="autofill"
                 />
               </UITooltip>
             </div>
             <ErrorMessage class="mt-2 block text-red-600" name="email" />
-          </label>
-          <label class="block" for="password">
-            <div class="font-bold">密碼</div>
+          </div>
+          <div class="block">
+            <label class="block font-bold" for="password">密碼</label>
             <div class="relative">
               <VField
                 id="password"
-                v-model.trim="fromData.password"
+                v-model="fromData.password"
                 :class="[
                   errors.password
                     ? 'ring-red-600'
@@ -61,6 +64,7 @@
                 ]"
                 name="password"
                 label="密碼"
+                autocomplete="current-password"
                 :type="typeIsPassword ? 'password' : 'text'"
                 rules="required"
                 :disabled="apiFetching"
@@ -73,11 +77,13 @@
                 size="sm"
                 square
                 variant="text"
+                :aria-label="typeIsPassword ? '顯示密碼' : '隱藏密碼'"
+                :aria-pressed="!typeIsPassword"
                 @click="typeIsPassword = !typeIsPassword"
               />
             </div>
             <ErrorMessage class="mt-2 block text-red-600" name="password" />
-          </label>
+          </div>
         </div>
 
         <div class="space-y-4">
@@ -110,6 +116,8 @@
 <script lang="ts" setup>
 import { loginAPI } from '@/api'
 import { useCommonStore, useMessageStore } from '@/stores'
+import demoAccount from '@/config/demo-account.json'
+import { apiFailure } from '@/utils/api-error'
 import type { LoginForm } from '@/types'
 
 /* 全局屬性 */
@@ -128,9 +136,10 @@ const typeIsPassword = ref<boolean>(true)
 
 /* 自動填入 */
 const autofill = () => {
+  if (apiFetching.value) return
   fromData.value = {
-    email: 'test@example.com',
-    password: 'test123456'
+    email: demoAccount.email,
+    password: demoAccount.password
   }
   messageStore.success({
     message: `已自動填入.`
@@ -138,29 +147,36 @@ const autofill = () => {
 }
 
 /* 登入 API */
-const { isFetching: apiFetching, execute: loginExecute } = loginAPI({
-  afterFetch({ data }) {
+let active = true
+const { isFetching: apiFetching, execute: loginExecute, abort } = loginAPI({
+  async afterFetch({ data }) {
+    if (!active) return { data }
     const { token, nickname } = data
     commonStore.auth = {
       token,
       nickname
     }
-    router.push({ name: 'todo' })
+    await router.push({ name: 'todo' })
     return { data }
   },
-  onFetchError({ data }) {
+  onFetchError({ data, error, response }) {
+    if (!active) return { data, error }
     Swal?.fire({
-      title: data.message,
+      title: apiFailure(data, error, response?.status ?? null).message,
       icon: 'error',
-      showConfirmButton: false,
-      timer: 2000,
+      showConfirmButton: true,
+      confirmButtonText: '確認',
       willClose: () => {
         document.getElementById('email')?.focus()
       }
     })
-    return data
+    return { data, error }
   }
 }).post(computed(() => fromData.value))
+function submit() {
+  if (!apiFetching.value) loginExecute()
+}
+onBeforeUnmount(() => { active = false; abort() })
 </script>
 
 <style lang="scss" scoped>

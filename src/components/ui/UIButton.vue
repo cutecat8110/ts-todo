@@ -7,11 +7,11 @@
       props.trailing && 'flex-row-reverse',
       props.round ? 'rounded-full' : 'rounded-md',
       props.block && 'w-full min-w-full',
-      'flex items-center justify-center gap-2 font-medium transition-colors disabled:opacity-75'
+      'flex items-center justify-center gap-2 font-medium transition-colors disabled:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
     ]"
     type="button"
   >
-    <Icon v-if="currentIcon" :class="[iconSize, 'leading-none']" :icon="currentIcon" />
+    <Icon v-if="currentIcon" aria-hidden="true" :class="[iconSize, 'leading-none']" :icon="currentIcon" />
     {{ props.label }}
   </button>
 </template>

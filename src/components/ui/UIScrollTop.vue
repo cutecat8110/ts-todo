@@ -1,8 +1,8 @@
 <template>
   <Transition name="scroll-top">
-    <div v-if="scrollTopIsShow" class="ui-scroll-top" @click="scrollTop()">
+    <button v-if="scrollTopIsShow" type="button" aria-label="回到頂端" class="ui-scroll-top" @click="scrollTop()">
       <Icon icon="ic:round-vertical-align-top" />
-    </div>
+    </button>
   </Transition>
 </template>
 

@@ -5,15 +5,15 @@
         ref="formRefs"
         v-slot="{ errors }"
         class="flex max-w-80 flex-1 flex-col gap-16 pb-16"
-        @submit="signupExecute()"
+        @submit="submit"
       >
         <div class="tracking-widest">
           <h1 class="text-center text-4xl font-bold text-green-600">TS Todo</h1>
           <h2 class="mt-2 text-center text-sm text-gray-400">Sign up for System</h2>
         </div>
         <div class="space-y-4">
-          <label class="block" for="email">
-            <div class="font-bold">電子信箱</div>
+          <div class="block">
+            <label class="block font-bold" for="email">電子信箱</label>
             <div class="relative">
               <VField
                 id="email"
@@ -26,8 +26,9 @@
                 ]"
                 name="email"
                 label="電子信箱"
-                type="text"
-                rules="required"
+                type="email"
+                autocomplete="email"
+                rules="required|email"
                 :disabled="apiFetching"
               />
 
@@ -41,18 +42,20 @@
                   size="sm"
                   square
                   variant="text"
+                  aria-label="自動填入預設"
+                  :disabled="apiFetching"
                   @click="autofill"
                 />
               </UITooltip>
             </div>
             <ErrorMessage class="mt-2 block text-red-600" name="email" />
-          </label>
-          <label class="block" for="password">
-            <div class="font-bold">密碼</div>
+          </div>
+          <div class="block">
+            <label class="block font-bold" for="password">密碼</label>
             <div class="relative">
               <VField
                 id="password"
-                v-model.trim="fromData.password"
+                v-model="fromData.password"
                 :class="[
                   errors.password
                     ? 'ring-red-600'
@@ -61,6 +64,7 @@
                 ]"
                 name="password"
                 label="密碼"
+                autocomplete="new-password"
                 :type="typeIsPassword ? 'password' : 'text'"
                 rules="required|min:6"
                 :disabled="apiFetching"
@@ -72,13 +76,15 @@
                 size="sm"
                 square
                 variant="text"
+                :aria-label="typeIsPassword ? '顯示密碼' : '隱藏密碼'"
+                :aria-pressed="!typeIsPassword"
                 @click="typeIsPassword = !typeIsPassword"
               />
             </div>
             <ErrorMessage class="mt-2 block text-red-600" name="password" />
-          </label>
-          <label class="block" for="nickname">
-            <div class="font-bold">暱稱</div>
+          </div>
+          <div class="block">
+            <label class="block font-bold" for="nickname">暱稱</label>
             <VField
               id="nickname"
               v-model.trim="fromData.nickname"
@@ -95,7 +101,7 @@
               :disabled="apiFetching"
             />
             <ErrorMessage class="mt-2 block text-red-600" name="nickname" />
-          </label>
+          </div>
         </div>
         <div class="space-y-4">
           <UIButton
@@ -127,6 +133,8 @@
 <script lang="ts" setup>
 import { signupAPI } from '@/api'
 import { useStyleStore, useMessageStore } from '@/stores'
+import demoAccount from '@/config/demo-account.json'
+import { apiFailure } from '@/utils/api-error'
 import type { SignupForm } from '@/types'
 
 /* 全局屬性 */
@@ -146,10 +154,11 @@ const typeIsPassword = ref<boolean>(true)
 
 /* 自動填入 */
 const autofill = () => {
+  if (apiFetching.value) return
   fromData.value = {
-    email: 'test@example.com',
-    password: 'test123456',
-    nickname: '小明'
+    email: demoAccount.email,
+    password: demoAccount.password,
+    nickname: demoAccount.nickname
   }
   messageStore.success({
     message: `已自動填入.`
@@ -157,8 +166,10 @@ const autofill = () => {
 }
 
 /* 註冊 API */
-const { isFetching: apiFetching, execute: signupExecute } = signupAPI({
+let active = true
+const { isFetching: apiFetching, execute: signupExecute, abort } = signupAPI({
   afterFetch({ data }) {
+    if (!active) return { data }
     Swal?.fire({
       title: '註冊成功!',
       text: '登入你的 TS Todo 帳戶',
@@ -169,21 +180,26 @@ const { isFetching: apiFetching, execute: signupExecute } = signupAPI({
         router.push({ name: 'login' })
       }
     })
-    return data
+    return { data }
   },
-  onFetchError({ data }) {
+  onFetchError({ data, error, response }) {
+    if (!active) return { data, error }
     Swal?.fire({
-      title: data.message,
+      title: apiFailure(data, error, response?.status ?? null).message,
       icon: 'error',
-      showConfirmButton: false,
-      timer: 2000,
+      showConfirmButton: true,
+      confirmButtonText: '確認',
       willClose: () => {
         document.getElementById('email')?.focus()
       }
     })
-    return data
+    return { data, error }
   }
 }).post(computed(() => fromData.value))
+function submit() {
+  if (!apiFetching.value) signupExecute()
+}
+onBeforeUnmount(() => { active = false; abort() })
 </script>
 
 <style lang="scss" scoped>

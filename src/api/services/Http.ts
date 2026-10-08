@@ -11,10 +11,11 @@ const fetch = createFetch({
   },
   options: {
     immediate: false, // 是否自動運行
-    timeout: 30000, // 請求過期時間
-    beforeFetch({ options }) {
+    timeout: 30000,
+    updateDataOnError: true, // 請求過期時間
+    beforeFetch({ url, options }) {
       const commonStore = useCommonStore()
-      if (commonStore.auth.token !== '') {
+      if (commonStore.auth.token !== '' && !/\/users\/sign_(in|up)$/.test(url)) {
         options.headers = { ...options.headers, Authorization: commonStore.auth.token }
       }
       return { options }
