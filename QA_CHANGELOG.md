@@ -46,3 +46,16 @@
 - 正式產物為 `docs/`，API 應為 `https://todolist-api.hexschool.io`；fixture 與測試程式不進入 docs。
 - GitHub Pages 原設定：`main`、`/docs`；發布新版本使用 `portfolio/qa`、`/docs`，保留既有網址。
 - 回復時可將 Pages 來源改回 `main`、`/docs`。原提交 `595a4ce68c91ed4846348fe734f0bd86ee123870` 保持不變。
+
+## 2026-10-08 載入檢查｜T-11（已修正）
+
+- 重現：登入頁的 Google Fonts 原先藏於應用 CSS 的 @import；瀏覽器讀取應用 stylesheet 後，才發現字型 stylesheet。
+- 修改：相同字型、字重及 display=swap URL 移至 HTML head，加入字型來源 preconnect，提前開始下載；沒有更換字型或砍掉使用者輸入字元。
+- 驗證：15/15 回歸、lint、TypeScript、正式 build 通過；登入與註冊切換、八組尺寸正常。入口 JS 大小維持 279,385 bytes，原有路由分割持續有效。
+- 檢查結果：實際登入／待辦介面沒有需要下載的大型點陣照片，README 的 demo.png 不在頁面中；不為了圖片優化而新增圖片依賴或重構 API。
+- 未量測固定網路下的字型完成時間；不能把請求發現時間提前說成固定快了幾秒。
+
+- 環境：2026-10-08，macOS / Chrome 155；320、375、390、768、769、1024、1440px 與 844×390。皆為桌面瀏覽器尺寸模擬，不是真機。
+- 正式建置首屏八組尺寸均無水平溢出，圖片沒有因本輪修改而載入失敗；逐頁結果見 `qa/loading-rwd.json`。這些是尺寸與資產檢查，不是 Lighthouse、LCP 或固定弱網的測速分數。
+- 保留原設計、照片內容、字型、裁切、動畫節奏、API 與功能流程。沒有修改線上會員、貼文、商品、訂單或待辦資料。
+- 發布沿用 `portfolio/qa` 與原 GitHub Pages 網址；`main` 保留原內容。真機、跨瀏覽器、限速網路與完整交易流程未於本輪重測。

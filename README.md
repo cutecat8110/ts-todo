@@ -119,3 +119,9 @@ Fixture 不會轉送正式 API；重啟會重設資料。Vitest 測試也只使�
     </tr>
     </tbody>
 </table>
+
+## 載入維護（2026-10-08）
+
+Google Fonts 保持原字型／字重，載入連結維護於 `index.html`，避免重新加入 CSS @import 造成額外的請求發現等待。介面沒有大型點陣照片，路由分割與 API 邏輯保留。
+
+檢查方法、數據及外部服務限制見 [QA_CHANGELOG.md](QA_CHANGELOG.md)。
