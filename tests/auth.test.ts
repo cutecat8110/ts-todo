@@ -7,6 +7,7 @@ import { required, email, min } from '@vee-validate/rules'
 import Login from '@/views/LoginView.vue'
 import Signup from '@/views/SignupView.vue'
 import { useCommonStore } from '@/stores/common'
+import demoAccount from '@/config/demo-account.json'
 
 let wrapper: VueWrapper
 const fire = vi.fn()
@@ -23,6 +24,31 @@ beforeEach(() => { fire.mockReset() })
 afterEach(() => { wrapper?.unmount(); vi.unstubAllGlobals() })
 
 describe('Authentication forms', () => {
+  it('only fills credentials until submitted and keeps recovery locked until sign-in completes', async () => {
+    let finishRegistration!: (response: Response) => void
+    const request = vi.fn()
+      .mockResolvedValueOnce(json({ status: false, message: '帳號密碼驗證錯誤' }, 404))
+      .mockImplementationOnce(() => new Promise<Response>(resolve => { finishRegistration = resolve }))
+      .mockResolvedValueOnce(json({ status: true, token: 'demo-token', nickname: demoAccount.nickname }))
+    vi.stubGlobal('fetch', request)
+    const { router, store } = await setup()
+    await wrapper.get('[aria-label="自動填入預設"]').trigger('click')
+    expect((wrapper.get('#email').element as HTMLInputElement).value).toBe(demoAccount.email)
+    expect((wrapper.get('#password').element as HTMLInputElement).value).toBe(demoAccount.password)
+    expect(request).not.toHaveBeenCalled()
+    await wrapper.get('form').trigger('submit'); await flushPromises()
+    await vi.waitFor(() => expect(request).toHaveBeenCalledTimes(2))
+    expect(wrapper.get('[aria-label="自動填入預設"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeDefined()
+    await wrapper.get('form').trigger('submit'); await flushPromises()
+    expect(request).toHaveBeenCalledTimes(2)
+    finishRegistration(json({ status: true }, 201))
+    await flushPromises()
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('todo'))
+    expect(store.auth).toEqual({ token: 'demo-token', nickname: demoAccount.nickname })
+    expect(request).toHaveBeenCalledTimes(3)
+    expect(fire).not.toHaveBeenCalled()
+  })
   it('reports a non-JSON server failure without throwing from its error handler', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response('Bad Gateway', { status: 502 })))
     await setup()

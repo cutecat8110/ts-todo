@@ -1,8 +1,9 @@
 import type { UseFetchOptions } from '@vueuse/core'
 import Http from './Http'
+import { fetchLogin } from './demo-login'
 
 export function loginAPI(options: UseFetchOptions) {
-  return Http.post('/users/sign_in', options)
+  return Http.post('/users/sign_in', { ...options, fetch: fetchLogin })
 }
 
 export function signupAPI(options: UseFetchOptions) {
