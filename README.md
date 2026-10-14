@@ -34,8 +34,8 @@ npm run preview -- --host 127.0.0.1
 - `src/config/demo-account.json` 是專用的**公開展示帳號**，供原有鑰匙按鈕帶入；不是管理員帳號，也不包含使用者私人帳密。此帳號的待辦是共用的。
 - 保留原 Vue／TypeScript、Pinia、Tailwind 與 API 流程。錯誤會顯示可讀訊息，寫入不自動重送；清單讀取失敗可手動重試。
 - 一般 Enter 保留換行；Ctrl / ⌘ + Enter 可提交新增或編輯中的待辦。輸入法組字、空白內容及按住快捷鍵不會重複送出。
-- `npm run build` 會執行 TypeScript 檢查並輸出 `docs/`；發布使用 `portfolio/qa` 的 `/docs`。預設 `.env` 指向正式 API，發布前確認沒有 `.env.local` 覆寫。
-- 回復部署時，將 GitHub Pages 改回 `main`、`/docs`；本輪原始提交為 `595a4ce68c91ed4846348fe734f0bd86ee123870`。
+- `npm run build` 會執行 TypeScript 檢查並輸出 `docs/`；發布使用 `main` 的 `/docs`。預設 `.env` 指向正式 API，發布前確認沒有 `.env.local` 覆寫。
+- 回復部署時，將所需版本的 `docs/` 以新提交恢復至 `main`，Pages 維持 `main`、`/docs`；本輪原始提交為 `595a4ce68c91ed4846348fe734f0bd86ee123870`。
 
 ### 隔離 QA
 
