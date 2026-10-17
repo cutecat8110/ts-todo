@@ -15,7 +15,7 @@
 - [API 文件](https://todolist-api.hexschool.io/doc/)
 - [Demo](https://cutecat8110.github.io/ts-todo/)
 
-**試用：** 點電子信箱旁的鑰匙帶入展示帳密，再按「登入」。
+**試用：** 鑰匙可帶入 `test@example.com`（測試帳號），再按「登入」。
 
 ## 🌸 啟動、測試與部署
 
