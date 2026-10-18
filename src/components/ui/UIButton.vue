@@ -89,9 +89,9 @@ const cssColor = computed<string>(() => {
     },
     text: {
       default:
-        'text-gray-300 underline-offset-4 hover:text-blue-700 disabled:text-gray-300 disabled:no-underline',
+        'text-gray-500 underline-offset-4 hover:text-blue-700 disabled:text-gray-300 disabled:no-underline',
       lightGray:
-        'text-gray-300 underline-offset-4 hover:text-gray-400 disabled:text-gray-300 disabled:no-underline',
+        'text-gray-500 underline-offset-4 hover:text-gray-600 disabled:text-gray-300 disabled:no-underline',
       darkGray:
         'text-gray-500 underline-offset-4 hover:text-gray-600 disabled:text-gray-500 disabled:no-underline',
       blue: 'text-blue-600 underline-offset-4 hover:text-blue-700 disabled:text-blue-600 disabled:no-underline',
