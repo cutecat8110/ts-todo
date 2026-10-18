@@ -1,23 +1,26 @@
-# TS Todo - 待辦清單應用
+# TS Todo｜待辦清單
 
 ![Node](https://img.shields.io/badge/Node.js-v22.23.3-brightgreen.svg)
 ![Vue](https://img.shields.io/badge/Vue.js-v3-blue.svg)
 ![Tailwindcss](https://img.shields.io/badge/Tailwindcss-v3-deepskyblue.svg)
 
-> 這是一款「輕巧實用」的待辦清單應用，讓你能輕鬆地管理日常事務。只需註冊，即可建立、追蹤並完成待辦任務，讓你更專注於工作和生活。
+帳號註冊、待辦新增與編輯，支援完成狀態、篩選及鍵盤提交。
 
-![](https://cutecat8110.github.io/ts-todo/demo.png)
+**[Demo](https://cutecat8110.github.io/ts-todo/#/login)** · [API 文件](https://todolist-api.hexschool.io/doc/)
 
-## 📋 專案概述
+![TS Todo 登入與帳密帶入入口](public/demo.png)
 
-此專案旨在提升 Vue Composition API + TypeScript 技術熟練度，強調簡潔且有效的用戶介面設計。<br />專案是獨立開發的，包含設計切版、動效實現和 API 串接等，最終目標是建立一個包含用戶註冊和待辦任務等基本功能的應用程式。
+<details>
+<summary>使用說明</summary>
 
-- [API 文件](https://todolist-api.hexschool.io/doc/)
-- [Demo](https://cutecat8110.github.io/ts-todo/)
+鑰匙可帶入測試帳號，待辦內容為共用。課程 API 每日凌晨 1:15 清除資料；帳號清除後可由登入流程重建。請勿保存重要或私人資料。
 
-**試用：** 鑰匙可帶入 `test@example.com`（測試帳號），再按「登入」。
+Enter 換行，Ctrl／⌘ + Enter 送出待辦。
 
-## 🌸 啟動、測試與部署
+</details>
+
+<details>
+<summary>開發、測試與部署</summary>
 
 使用 `.node-version` 指定的 Node 22.23.3：
 
@@ -38,7 +41,6 @@ npm run preview -- --host 127.0.0.1
 - 保留原 Vue／TypeScript、Pinia、Tailwind 與 API 流程。錯誤會顯示可讀訊息，寫入不自動重送；清單讀取失敗可手動重試。
 - 一般 Enter 保留換行；Ctrl / ⌘ + Enter 可提交新增或編輯中的待辦。輸入法組字、空白內容及按住快捷鍵不會重複送出。
 - `npm run build` 會執行 TypeScript 檢查並輸出 `docs/`；發布使用 `main` 的 `/docs`。預設 `.env` 指向正式 API，發布前確認沒有 `.env.local` 覆寫。
-- 回復部署時，將所需版本的 `docs/` 以新提交恢復至 `main`，Pages 維持 `main`、`/docs`；本輪原始提交為 `595a4ce68c91ed4846348fe734f0bd86ee123870`。
 
 ### 隔離 QA
 
@@ -53,80 +55,17 @@ Fixture 不會轉送正式 API；重啟會重設資料。Vitest 測試也只使�
 
 修正編號、兩輪 QA 結果、RWD 量測與已知限制：[QA_CHANGELOG.md](QA_CHANGELOG.md)。
 
-## 🔨 核心技術
-
-<table>
-    <tbody>
-    <tr>
-        <td>
-        <a href="https://vuejs.org/"> Vue 3 </a>
-        </td>
-        <td>JavaScript 框架</td>
-    </tr>
-    <tr>
-        <td>
-        <a href="https://www.typescriptlang.org/"> TypeScript </a>
-        </td>
-        <td>JavaScript 的超集</td>
-    </tr>
-    <tr>
-        <td>
-        <a href="https://pinia.vuejs.org/"> Pinia </a>
-        </td>
-        <td>Vue.js 的狀態管理庫</td>
-    </tr>
-    <tr>
-        <td>
-        <a href="https://tailwindcss.com/"> Tailwind CSS </a>
-        </td>
-        <td>CSS 框架</td>
-    </tr>
-    </tbody>
-</table>
-
-<br />
-
-## 🛠️ 擴展套件
-
-<table>
-    <tbody>
-    <tr>
-        <td>
-        <a href="https://sweetalert2.github.io/"> SweetAlert 2 </a>
-        </td>
-        <td>可定製訊息彈框</td>
-    </tr>
-    <tr>
-        <td>
-        <a href="https://vee-validate.logaretm.com/v4/"> VeeValidate </a>
-        </td>
-        <td>表單驗證庫</td>
-    </tr>
-    <tr>
-        <td>
-        <a href="https://day.js.org/"> Day.js </a>
-        </td>
-        <td>輕量級日期和時間處理庫</td>
-    </tr>
-    <tr>
-        <td>
-        <a href="https://vueuse.org/"> VueUse </a>
-        </td>
-        <td>Vue 3 Composition API 的實用函數庫</td>
-    </tr>
-    <tr>
-        <td>
-        <a href="https://iconify.design/"> Iconify </a>
-        </td>
-        <td>大量開源向量圖標</td>
-    </tr>
-    </tbody>
-</table>
-
-## 載入維護（2026-10-08）
+### 素材維護
 
 Google Fonts 保持原字型／字重，載入連結維護於 `index.html`，避免重新加入 CSS @import 造成額外的請求發現等待。介面沒有大型點陣照片，路由分割與 API 邏輯保留。
 
-檢查方法、數據及外部服務限制見 [QA_CHANGELOG.md](QA_CHANGELOG.md)。
+</details>
 
-[介面設計規範](DESIGN_GUIDELINES.md)
+<details>
+<summary>技術與套件</summary>
+
+[Vue 3](https://vuejs.org/) · [TypeScript](https://www.typescriptlang.org/) · [Pinia](https://pinia.vuejs.org/) · [Tailwind CSS](https://tailwindcss.com/) · [SweetAlert 2](https://sweetalert2.github.io/) · [VeeValidate](https://vee-validate.logaretm.com/v4/) · [Day.js](https://day.js.org/) · [VueUse](https://vueuse.org/) · [Iconify](https://iconify.design/)
+
+</details>
+
+[QA 紀錄](QA_CHANGELOG.md) · [介面設計規範](DESIGN_GUIDELINES.md)
