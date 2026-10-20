@@ -4,13 +4,13 @@
 ![Vue](https://img.shields.io/badge/Vue.js-v3-blue.svg)
 ![Tailwindcss](https://img.shields.io/badge/Tailwindcss-v3-deepskyblue.svg)
 
-> 輕巧的待辦清單應用，註冊後即可新增、編輯、依狀態查看並完成日常任務。
+> 輕巧的待辦清單應用，註冊後即可新增、編輯並完成日常任務。
 
 ![TS Todo 登入與帳密帶入入口](public/demo.png)
 
 ## 📋 專案概述
 
-此專案以 Vue Composition API 與 TypeScript 開發，練習設計切版、動效和 API 串接。使用 Pinia 管理登入與清單狀態，並透過表單驗證、狀態篩選和鍵盤操作完成日常待辦流程。
+此專案以 Vue Composition API 與 TypeScript 開發，練習設計切版、動效和 API 串接。使用 Pinia 管理登入與清單狀態，並透過表單驗證、完成進度和鍵盤操作完成日常待辦流程。
 
 **[Demo](https://cutecat8110.github.io/ts-todo/#/login)** · [API 文件](https://todolist-api.hexschool.io/doc/)
 

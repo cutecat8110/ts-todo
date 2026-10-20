@@ -39,6 +39,8 @@
               ]"
               placeholder="Todo"
               aria-label="新增待辦事項"
+              :aria-invalid="addTodoDataError"
+              :aria-describedby="addTodoDataError ? 'new-todo-error' : undefined"
               :disabled="addTodoFetching || loading || !!loadError"
               @keydown="(event) => onKeyboardSubmit(event, onTodoSubmit)"
             />
@@ -49,12 +51,12 @@
               :disabled="addTodoFetching || loading || !!loadError"
               @click="onTodoSubmit()"
             />
-            <div v-if="addTodoDataError" class="w-full text-red-600">Todo 為必填</div>
+            <div v-if="addTodoDataError" id="new-todo-error" class="w-full text-red-600" role="alert">Todo 為必填</div>
           </div>
         </div>
 
         <div
-          class="relative mt-4 h-6 overflow-hidden rounded-full bg-gray-300 text-sm font-bold tracking-wide text-white"
+          class="relative mt-4 h-6 overflow-hidden rounded-full bg-gray-500 text-sm font-bold tracking-wide text-white"
         >
           <div
             v-if="TodoList.length !== 0"
@@ -108,6 +110,8 @@
                 'min-w-0 flex-1 resize-none rounded-md bg-transparent px-4 py-2 outline-none'
               ]"
               :aria-label="todo.edit ? '編輯待辦事項' : '待辦事項'"
+              :aria-invalid="todo.error"
+              :aria-describedby="todo.error ? `todo-error-${todo.id}` : undefined"
               placeholder="Todo"
               @input="todo.error = false"
               :readonly="!todo.edit"
@@ -161,7 +165,7 @@
                 />
               </template>
             </div>
-            <div v-if="todo.error" class="ml-10 w-full text-red-600">Todo 為必填</div>
+            <div v-if="todo.error" :id="`todo-error-${todo.id}`" class="ml-10 w-full text-red-600" role="alert">Todo 為必填</div>
           </li>
         </TransitionGroup>
       </div>
@@ -217,10 +221,10 @@ async function onTodoSubmit() {
     addTodoRefs.value?.focus()
     return
   }
-  if (await add(addTodoData.value)) {
-    addTodoData.value = ''
-    addTodoRefs.value?.focus()
-  }
+  const trigger = document.activeElement
+  if (await add(addTodoData.value)) addTodoData.value = ''
+  await nextTick()
+  if (document.activeElement === document.body || document.activeElement === trigger) addTodoRefs.value?.focus()
 }
 function onKeyboardSubmit(event: KeyboardEvent, submit: () => void) {
   if (event.isComposing || event.repeat || !(event.ctrlKey || event.metaKey) || event.key !== 'Enter') return
@@ -233,8 +237,14 @@ function editTodoToggle(todo: Todo) {
   todo.error = false
   todo.tempContent = todo.content
   if (todo.edit) nextTick(() => todo.editTodoRefs?.focus())
+  else nextTick(() => focusRowAction(todo, '編輯待辦'))
 }
-function handleTodo(todo: Todo, action: 'delete' | 'toggle' | 'update') {
+function focusRowAction(todo: Todo | undefined, label: string) {
+  const button = todo?.todoRefs?.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)
+  if (button) button.focus()
+  else addTodoRefs.value?.focus()
+}
+async function handleTodo(todo: Todo, action: 'delete' | 'toggle' | 'update') {
   if (action === 'update') {
     if (!todo.edit) return
     if (!todo.tempContent.trim()) {
@@ -243,7 +253,17 @@ function handleTodo(todo: Todo, action: 'delete' | 'toggle' | 'update') {
       return
     }
   }
-  mutate(todo, action)
+  const ownedFocus = todo.todoRefs?.contains(document.activeElement)
+  const index = TodoList.value.indexOf(todo)
+  const neighbor = TodoList.value[index + 1] || TodoList.value[index - 1]
+  const saved = await mutate(todo, action)
+  await nextTick()
+  // Do not steal focus if another row or the new-todo field was selected while waiting.
+  if (!ownedFocus || (document.activeElement !== document.body && !todo.todoRefs?.contains(document.activeElement))) return
+  if (saved && action === 'delete') focusRowAction(neighbor, '編輯待辦')
+  else if (saved && action === 'update') focusRowAction(todo, '編輯待辦')
+  else if (action === 'update') todo.editTodoRefs?.focus()
+  else focusRowAction(todo, action === 'toggle' ? (todo.status ? '標記為未完成' : '標記為完成') : '刪除待辦')
 }
 // Resize after content or edit mode changes, without creating watchers on each refresh.
 watch([() => TodoList.value.map((todo) => [todo.tempContent, todo.edit]), windowWidth], async () => {
